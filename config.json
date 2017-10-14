@@ -4,6 +4,6 @@
     "break": 5
   },
   "messageQueue": {
-    "name": "/tmp/pomodoro-intrusive"
+    "id": 29010
   }
 }

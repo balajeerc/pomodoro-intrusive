@@ -1,5 +1,5 @@
 export const LAUNCH = 'pomodoro-intrusive/nagProcess/LAUNCH';
-export const HALT = 'pomodoro-intrusive/nagProcess/HALT';
+export const SHUTDOWN = 'pomodoro-intrusive/nagProcess/HALT';
 export const BEGIN_WORK = 'pomodoro-intrusive/nagProcess/BEGIN_WORK';
 export const WAIT_ON_WORK = 'pomodoro-intrusive/nagProcess/WAIT_ON_WORK';
 export const BEGIN_BREAK = 'pomodoro-intrusive/nagProcess/SWITCH_TO_BREAK';

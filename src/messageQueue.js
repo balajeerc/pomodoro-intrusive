@@ -27,7 +27,15 @@ export function createMessageChannel(messageQueue) {
     };
 
     // setup the subscription
-    messageQueue.on('ping', messageHandler);
+    messageQueue.on('data', messageHandler);
+
+    // the subscriber must return an unsubscribe function
+    // this will be invoked when the saga calls `channel.close` method
+    const unsubscribe = () => {
+      messageQueue.on('data', () => {});
+    };
+
+    return unsubscribe;
   });
 }
 
