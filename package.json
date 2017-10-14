@@ -1,0 +1,34 @@
+{
+  "name": "pomodoro-intrusive",
+  "version": "0.0.1",
+  "description": "Intrusive commandline pomodoro utility that locks you out of your screen!",
+  "main": "pomodoro-intrusive.js",
+  "repository": "git@github.com:balajeerc/pomodoro-intrusive.git",
+  "author": "Balajee Ramachandran",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "cross-env": "^5.0.5",
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "jest": "^21.2.1"
+  },
+  "scripts": {
+    "test": "cross-env NODE_ENV=test jest",
+    "test:updateSnapshot": "cross-env NODE_ENV=test jest -u",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage"
+  },
+  "dependencies": {
+    "redux": "^3.7.2",
+    "redux-saga": "^0.15.6",
+    "svmq": "^1.0.6"
+  }
+}

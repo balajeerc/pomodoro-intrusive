@@ -1,0 +1,9 @@
+{
+  "pomodoroTimes": {
+    "work": 25,
+    "break": 5
+  },
+  "messageQueue": {
+    "name": "/tmp/pomodoro-intrusive"
+  }
+}

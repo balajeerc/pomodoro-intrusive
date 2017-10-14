@@ -1,0 +1,13 @@
+{
+  "README":
+    "This file contains commands that will be used to lock screen on various platforms. Enter a custom command in custom section to override defaults for your system",
+  "darwin":
+    "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession -suspend",
+  "win32": "rundll32.exe user32.dll, LockWorkStation",
+  "linux": {
+    "i3": "i3lock",
+    "gnome": "gnome-screensaver-command",
+    "kde": "qdbus org.freedesktop.ScreenSaver /ScreenSaver Lock"
+  },
+  "custom": ""
+}
