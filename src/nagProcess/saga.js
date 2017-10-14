@@ -4,35 +4,38 @@
  * Basically the nerve centre of the nagger app, coordinating
  * incoming messages and corresponding state changes
  */
-import { call, fork, take, takeEvery } from 'redux-saga/effects';
+import { call, fork, take, race, put } from 'redux-saga/effects';
 
-import { LAUNCH, SHUTDOWN } from './constants';
-import config from '../../config.json';
-import { createMessageQueue, createMessageChannel } from '../messageQueue';
+import logger from '../logger';
+import { LAUNCH, SHUTDOWN, STOP_MESSAGING } from './constants';
+import { stopMessaging, shutdown } from './actions';
+import startMessaging from './messaging';
 
-function* watchForMessages() {
-  const messageQueue = yield call(createMessageQueue, config.messageQueue.id);
-  const messageChannel = yield call(createMessageChannel, messageQueue);
-
-  while (true) {
-    const message = yield take(messageChannel);
-    console.log('recieved message: ' + message);
-  }
+function* initiateShutdown() {
+  logger.nag.log('info', 'Initiating pomodoro nag shutdown...');
+  yield put(shutdown());
 }
 
-function* launch() {
-  yield takeEvery(LAUNCH, watchForMessages);
-}
-
-function* shutdown() {
-  yield takeEvery(SHUTDOWN, () => {
-    console.log('shutting down...');
+function* launchNagProcess() {
+  yield take(LAUNCH);
+  yield race({
+    task: call(startMessaging, initiateShutdown),
+    cancel: take(STOP_MESSAGING),
   });
 }
 
+function* shutdownNagProcess() {
+  yield take(SHUTDOWN);
+  logger.nag.log('info', 'Shutting down pomodoro nag process...');
+  yield put(stopMessaging());
+}
+
 function* nagProcess() {
-  console.log('Staring pomodoro nag process');
-  yield [fork(launch), fork(shutdown)];
+  logger.nag.log('info', 'Spawning pomodoro nag process...');
+  yield fork(launchNagProcess);
+  yield call(shutdownNagProcess);
+  logger.nag.log('info', 'pomodoro nag process shutdown complete');
+  process.exit(0);
 }
 
 export default nagProcess;

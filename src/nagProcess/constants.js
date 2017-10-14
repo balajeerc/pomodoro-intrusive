@@ -5,3 +5,4 @@ export const WAIT_ON_WORK = 'pomodoro-intrusive/nagProcess/WAIT_ON_WORK';
 export const BEGIN_BREAK = 'pomodoro-intrusive/nagProcess/SWITCH_TO_BREAK';
 export const WAIT_ON_BREAK = 'pomodoro-intrusive/nagProcess/WAIT_ON_BREAK';
 export const WAIT_FOR_ACTIVITY = 'pomodoro-intrusive/nagProcess/WAIT_FOR_ACTIVITY';
+export const STOP_MESSAGING = 'pomodoro-intrusive/nagProcess/STOP_MESSAGING';

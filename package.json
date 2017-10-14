@@ -29,6 +29,7 @@
   "dependencies": {
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
-    "svmq": "^1.0.6"
+    "svmq": "^1.0.6",
+    "winston": "^3.0.0-rc0"
   }
 }
