@@ -1,3 +1,9 @@
+/*
+ * Saga that controls the messaging in the pomodoro-nag process
+ *
+ * Sets up to listen for Sys5 message queue for incoming control
+ * commands from the client app (pomodoro-intrusive)
+ */
 import { call, take } from 'redux-saga/effects';
 
 import logger from '../logger';
@@ -6,6 +12,11 @@ import config from '../../config.json';
 import { createMessageQueue, createMessageChannel } from '../messageQueue';
 import { SHUTDOWN_POMODORO_NAG } from '../controlCommands';
 
+/*
+ * Sets up message queue processing
+ *
+ * @param {generator} shutdownAction Saga to be invoked on receiving shutdown command
+ */
 export default function* startMessaging(shutdownAction) {
   let messageChannel;
   try {
