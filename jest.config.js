@@ -1,3 +1,1 @@
-module.exports = {
-  setupFiles: ['raf/polyfill'],
-};
+module.exports = {};

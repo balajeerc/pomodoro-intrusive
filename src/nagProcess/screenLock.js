@@ -1,42 +1,76 @@
-import os from 'os';
-import { execSync } from 'child_process';
-import lockCommand from '../lockCommand.json';
+/*
+ * Utility to lock and unlock screen
+ *
+ * Uses the commands specified in lockCommand.json to do the actual lock/unlock
+ */
 
-function getLockCommand(currentPlatform, desktopEnvironment) {
-  // If user has entered a custom command to lock screen in the configuration.
-  // then just use that
-  if ('custom' in lockCommand && lockCommand.custom.length > 0) {
-    return lockCommand.custom;
+import os from 'os';
+import { exec } from 'child_process';
+import hasbin from 'hasbin';
+import { call, cps } from 'redux-saga/effects';
+
+import commandConfiguration from '../../lockCommand.json';
+
+/*
+ * Returns a string containing the command to be run (with args concated in)
+ * The choice is made on the command specified in command configuration specified
+ *
+ * @param {Object} commandConfig Configuration object containing commmand configuration
+ * @param {string} commandType Either 'lock' or 'unlock'
+ * @param {string} currentPlatform Name of current OS as returned by os.platform()
+ *                  (eg. 'darwin', 'linux', 'win32' etc.)
+ * @param {Function} pathCheck function to use to check whether the config specified exec is in PATH
+ *
+ */
+export function getLockCommand(commandConfig, commandType, currentPlatform, pathCheck) {
+  if (
+    !commandConfig ||
+    !commandType ||
+    typeof commandType !== 'string' ||
+    typeof commandConfig !== 'object' ||
+    !pathCheck ||
+    typeof pathCheck !== 'function'
+  ) {
+    return '';
   }
 
-  if (currentPlatform === 'darwin' || currentPlatform === 'win32') {
-    return lockCommand[currentPlatform];
-  } else if (currentPlatform === 'linux') {
-    // Linux needs special handling for the various desktop environments possible
-    const matchedEnv = Object.keys(lockCommand.linux).filter(
-      desktopEnv => desktopEnvironment.search(desktopEnv) >= 0,
-    );
-    if (matchedEnv.length > 0) {
-      return lockCommand.linux[matchedEnv];
+  // TODO: These checks are getting hairy. Replace these validation checks with jsonschema
+  // based validation check
+  if (
+    'default' in commandConfig &&
+    typeof commandConfig.default === 'object' &&
+    currentPlatform in commandConfig.default &&
+    typeof commandConfig.default[currentPlatform] === 'object' &&
+    commandType in commandConfig.default[currentPlatform] &&
+    'command' in commandConfig.default[currentPlatform][commandType] &&
+    typeof commandConfig.default[currentPlatform][commandType].command === 'string' &&
+    commandConfig.default[currentPlatform][commandType].command.length > 0 &&
+    pathCheck(commandConfig.default[currentPlatform][commandType].command)
+  ) {
+    const lockObj = commandConfig.default[currentPlatform][commandType];
+    if ('args' in lockObj && typeof lockObj.args === 'string') {
+      return `${lockObj.command} ${lockObj.args}`;
     }
+    return lockObj.command;
   }
 
   return '';
 }
 
-function getCurrentDesktopEnvironment() {
-  if (os.platform() !== 'linux') {
-    return '';
+function* runScreenCommand(commandType) {
+  const lockCmd = getLockCommand(commandConfiguration, commandType, os.platform(), hasbin.sync);
+  if (!lockCmd) {
+    throw new Error(
+      'Check config.json for lock command used and verify that it is compatible with your setup and that specified lock command is in PATH',
+    );
   }
-  return execSync('echo $DESKTOP_SESSION').toString();
+  yield cps(exec, lockCmd);
 }
 
-export default function lockScreen() {
-  const lockCmd = getLockCommand(os.platform(), getCurrentDesktopEnvironment());
-  if (lockCmd.length > 0) {
-    execSync(getLockCommand());
-    return;
-  }
-  // TODO: Log error properly
-  console.error('error'); // eslint-disable-line no-console
+export function* lockScreen() {
+  yield call(runScreenCommand, 'lock');
+}
+
+export function* unlockScreen() {
+  yield call(runScreenCommand, 'unlock');
 }
