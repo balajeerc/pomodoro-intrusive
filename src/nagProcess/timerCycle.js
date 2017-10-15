@@ -52,11 +52,11 @@ function* lockScreenLoop() {
   while (true) {
     try {
       logger.nag.info('Attempting to lock screen');
-      // yield call(lockScreen);
+      yield call(lockScreen);
     } catch (error) {
       logger.nag.log('error', `Error when attempting to call screenlock: ${error}`);
     }
-    yield call(delay, /*LOCK_SCREEN_REPEAT_INTERVAL*/ 0.1 * 60 * 1000);
+    yield call(delay, LOCK_SCREEN_REPEAT_INTERVAL * 1000);
   }
 }
 
@@ -84,8 +84,7 @@ function* waitOnBreak() {
     yield cancel(lockScreenLoopTask);
 
     logger.nag.log('info', 'Unlocking screen after elapse of break');
-    // yield call(unlockScreen);
-    //
+    yield call(unlockScreen);
     yield put(startWork());
   }
 }

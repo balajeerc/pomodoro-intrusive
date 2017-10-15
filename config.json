@@ -1,7 +1,7 @@
 {
   "pomodoroTimes": {
-    "work": 0.5,
-    "break": 0.5
+    "work": 25,
+    "break": 5
   },
   "messageQueue": {
     "id": 29010
