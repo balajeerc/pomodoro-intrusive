@@ -1,9 +1,18 @@
 # pomodoro-intrusive
 
+> __NOTE: This is a work in progress. Please check back for when there is a release.__
+
 pomodoro-intrusive is a utility that enforces the pomodoro discipline rather forcefully: by locking up your screen!
 Currently, it's only available for Linux and those of them with `gnome-screensaver-command` installed and functional.
 
-## Overview
+- [Overview](#overview)
+- [Motivation](#motivation)
+- [Installation](#installation)
+- [Running](#running)
+- [Configuration](#configuration)
+- [Roadmap](#roadmap)
+
+## <a name="overview">Overview</a>
 
 Here's what it does:
 
@@ -15,7 +24,7 @@ Here's what it does:
 6) After unlocking your screen, it keeps monitoring for mouse/keyboard activity. If it doesn't detect any, it is most probably because you left your workstation and are wasting time on Twitter. So helpfully, pomodoro-nag periodically plays a sound alerting you to GET BACK TO WORK!
 7) Once it detects that you're back at work, it resumes the work timer.
 
-## Motivation
+## <a name="motivation">Motivation</a>
 
 - Studies show that sitting for prolonged periods of time have a terrible effect on your lifespan. Taking breaks by getting up and moving around greatly alleviates the harms of sitting.
 - This was especially significant in my case, since I was struggling with back issues. Frequent breaks were made mandatory by my physio.
@@ -25,26 +34,42 @@ Here's what it does:
 - pomodoro technique is awesome, but the tools available to enforce this were far from adequate.
 - This tool is an attempt at solving the problems stated above.
 
-## Installation
+## <a name="installation">Installation</a>
 
-This utility needs node and npm.
+### Pre-requisites
+
+- Linux
+- node(v6.2+) with npm
+- gnome-screensaver-command
+    - Note that you can use gnome-screensaver-command even when running other desktop environments. I myself use i3-wm and gnome-screensaver-command works happily with that.
+    - If you still feel you want it done the way YOUR setup needs it done, take a look at the configuration section.
+
+### Package
 
 ```
 npm install -g pomodoro-intrusive
 ```
 
-## Requirements
+### Post-Install
 
-- Linux
-- gnome-screensaver-command
-    - Note that you can use gnome-screensaver-command even when running other desktop environments. I myself use i3-wm and gnome-screensaver-command works happily with that.
-    - If you still feel you want it done the way YOUR setup needs it done, take a look at the configuration section.
+Make sure that the shell script `pomodoro-intrusive` is in PATH
 
-## Configuration
+## <a name="running">Running</a>
 
-Configuration of the parameters such as the pomodoro activity intervals can be done by editing `config.json`.
+```
+pomodoro-intrusive start            # Starts the pomodoro nag process
+pomodoro-intrusive restart:work     # Restarts the work time
+pomodoro-intrusive restart:break    # Restarts the break time
+pomodoro-intrusive status           # Prints current pomodoro nag status
+pomodoro-intrusive stop             # Terminates the pomodoro nag process
+```
 
-## Future work
+## <a name="configuration">Configuration</a>
+
+- Configuration of the parameters such as the pomodoro activity intervals can be done by editing `config.json`.
+- Configruation/overriding of the screen locking mechanism can be achieved by editing `lockCommand.json`.
+
+## <a name="roadmap">Roadmap</a>
 
 - I wrote this over a weekend, so though initially I intended to be ambitious and target Windows and OSX as well, the overhead of figuring out the platform specific calls of automatic screen locking and unlocking were too overwhelming to tackle.
 - Drop me a mail/file an issue if you like this but need it for a different OS/desktop environment.
