@@ -11,6 +11,7 @@ import {
   STOP_LOCK_SCREEN_LOOP,
   WAIT_ON_WORK,
   WAIT_ON_BREAK,
+  START_ACTIVITY_CHECK,
 } from './constants';
 
 export function launch() {
@@ -58,5 +59,11 @@ export function startWork() {
 export function startBreak() {
   return {
     type: WAIT_ON_BREAK,
+  };
+}
+
+export function startActivityCheck() {
+  return {
+    type: START_ACTIVITY_CHECK,
   };
 }

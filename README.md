@@ -38,21 +38,17 @@ Here's what it does:
 
 ### Pre-requisites
 
-- Linux
 - node(v6.2+) with npm
-- gnome-screensaver-command
-    - Note that you can use gnome-screensaver-command even when running other desktop environments. I myself use i3-wm and gnome-screensaver-command works happily with that.
+- gnome-screensaver-command (On Ubuntu: `sudo apt-get install gnome-screensaver`)
+    - Note that you can use gnome-screensaver-command even when running other desktop environments (though this would involve pulling in a bunch of other gtk dependencies). I have gnome-screensaver-command installed though I use i3-wm as my window manager.
     - If you still feel you want it done the way YOUR setup needs it done, take a look at the configuration section.
+- xprintidle (On Ubuntu: `sudo apt-get install xprintidle`)
 
-### Package
+### Downloading from npm
 
 ```
 npm install -g pomodoro-intrusive
 ```
-
-### Post-Install
-
-Make sure that the shell script `pomodoro-intrusive` is in PATH
 
 ## <a name="running">Running</a>
 

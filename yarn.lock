@@ -1553,6 +1553,12 @@ find-cache-dir@^1.0.0:
     make-dir "^1.0.0"
     pkg-dir "^2.0.0"
 
+find-exec@0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/find-exec/-/find-exec-0.0.8.tgz#c89d36894ad7b6e2aa36b84270d0b2c9c32344db"
+  dependencies:
+    sync-exec "^0.6.2"
+
 find-up@^1.0.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/find-up/-/find-up-1.1.2.tgz#6b2e9822b1a2ce0a60ab64d610eccad53cb24d0f"
@@ -2891,6 +2897,12 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
+play-sound@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/play-sound/-/play-sound-1.1.1.tgz#a0a5d29358beb298d33021b13bdedee09c67e7f1"
+  dependencies:
+    find-exec "0.0.8"
+
 pluralize@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
@@ -3419,6 +3431,10 @@ symbol-observable@^1.0.3:
 symbol-tree@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.2.tgz#ae27db38f660a7ae2e1c3b7d1bc290819b8519e6"
+
+sync-exec@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/sync-exec/-/sync-exec-0.6.2.tgz#717d22cc53f0ce1def5594362f3a89a2ebb91105"
 
 table@^4.0.1:
   version "4.0.2"

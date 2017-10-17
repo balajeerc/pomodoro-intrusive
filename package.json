@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "hasbin": "^1.2.3",
+    "play-sound": "^1.1.1",
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6",
     "svmq": "^1.0.6",

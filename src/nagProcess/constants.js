@@ -8,3 +8,4 @@ export const WAIT_ON_BREAK = 'pomodoro-intrusive/nagProcess/WAIT_ON_BREAK';
 export const TRANSITION_TO_BREAK = 'pomodoro-intrusive/nagProcess/TRANSITION_TO_BREAK';
 export const START_LOCK_SCREEN_LOOP = 'pomodoro-intrusive/nagProcess/START_LOCK_SCREEN_LOOP';
 export const STOP_LOCK_SCREEN_LOOP = 'pomodoro-intrusive/nagProcess/STOP_LOCK_SCREEN_LOOP';
+export const START_ACTIVITY_CHECK = 'pomodoro-intrusive/nagProcess/START_ACTIVITY_CHECK';

@@ -11,18 +11,67 @@
  *
  */
 import { delay } from 'redux-saga';
-import { call, cancel, fork, take, put } from 'redux-saga/effects';
+import { call, cancel, cps, fork, take, put } from 'redux-saga/effects';
+import soundPlay from 'play-sound';
 
 import config from '../../config.json';
 import { lockScreen, unlockScreen } from './screenLock';
+import getTimeSinceLastActivity from './activityCheck';
 
-import { STOP_POMODORO_CYCLE, WAIT_ON_WORK, WAIT_ON_BREAK, TRANSITION_TO_WORK } from './constants';
-import { startWork, startBreak } from './actions';
+import {
+  STOP_POMODORO_CYCLE,
+  WAIT_ON_WORK,
+  WAIT_ON_BREAK,
+  START_ACTIVITY_CHECK,
+} from './constants';
+import { startWork, startBreak, startActivityCheck } from './actions';
 import logger from '../logger';
 
 const DEFAULT_POMODORO_WORK_TIME = 25; // in minutes
 const DEFAULT_POMODORO_BREAK_TIME = 5; // in minutes
-const LOCK_SCREEN_REPEAT_INTERVAL = 6; // in seconds
+
+// TODO: Make the following configurable using JSON
+const LOCK_SCREEN_REPEAT_INTERVAL = 5; // in seconds
+const INACTIVITY_CHECK_REPEAT_INTERVAL = 5; // in secs
+const SOUND_NOTIFICATION_FILE =
+  '/home/balajeerc/Projects/pomodoro-intrusive/sounds/back_to_work_notification.wav';
+// Threshold of inactive time above which we keep playing the
+// sound notification to return to/resume work
+const INACTIVITY_THRESHOLD_TIME = 30; // in secs
+
+const soundPlayer = soundPlay({});
+const playSound = soundPlayer.play.bind(soundPlayer);
+
+function* waitForActivity() {
+  while (true) {
+    try {
+      const timeSinceLastActivity = yield call(getTimeSinceLastActivity);
+      if (timeSinceLastActivity > INACTIVITY_THRESHOLD_TIME * 1000) {
+        logger.nag.log('info', 'Playing notification to return to work');
+        yield cps(playSound, SOUND_NOTIFICATION_FILE);
+      } else {
+        logger.nag.log('info', 'Activity detected. No more activity checking required.');
+        break;
+      }
+      yield call(delay, INACTIVITY_CHECK_REPEAT_INTERVAL * 1000);
+    } catch (error) {
+      logger.nag.log('error', `Malfunction when checking for activity: ${error}`);
+      break; // break out of activity check since there is no point repeating check
+    }
+  }
+}
+
+function* lockScreenLoop() {
+  while (true) {
+    try {
+      logger.nag.info('Attempting to lock screen');
+      yield call(lockScreen);
+    } catch (error) {
+      logger.nag.log('error', `Error when attempting to call screenlock: ${error}`);
+    }
+    yield call(delay, LOCK_SCREEN_REPEAT_INTERVAL * 1000);
+  }
+}
 
 function* waitOnWork() {
   while (true) {
@@ -45,18 +94,6 @@ function* waitOnWork() {
     };
     yield call(delay, workInterval() * 60 * 1000);
     yield put(startBreak());
-  }
-}
-
-function* lockScreenLoop() {
-  while (true) {
-    try {
-      logger.nag.info('Attempting to lock screen');
-      yield call(lockScreen);
-    } catch (error) {
-      logger.nag.log('error', `Error when attempting to call screenlock: ${error}`);
-    }
-    yield call(delay, LOCK_SCREEN_REPEAT_INTERVAL * 1000);
   }
 }
 
@@ -84,15 +121,23 @@ function* waitOnBreak() {
     yield cancel(lockScreenLoopTask);
 
     logger.nag.log('info', 'Unlocking screen after elapse of break');
-    yield call(unlockScreen);
-    yield put(startWork());
+
+    try {
+      yield call(unlockScreen);
+    } catch (error) {
+      logger.nag.log('error', `Error when attempting to call screenUnlock: ${error}`);
+    }
+    yield put(startActivityCheck());
   }
 }
 
 function* transitionToWork() {
   while (true) {
-    yield take(TRANSITION_TO_WORK);
-    logger.nag.log('info', 'Now in TRANSITION_TO_BREAK');
+    yield take(START_ACTIVITY_CHECK);
+    logger.nag.log('info', 'Now in TRANSITION_TO_WORK');
+    logger.nag.log('info', 'Waiting for activity');
+    yield call(waitForActivity);
+    yield put(startWork());
   }
 }
 
