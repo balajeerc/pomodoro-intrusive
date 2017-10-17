@@ -33,8 +33,7 @@ const DEFAULT_POMODORO_BREAK_TIME = 5; // in minutes
 // TODO: Make the following configurable using JSON
 const LOCK_SCREEN_REPEAT_INTERVAL = 5; // in seconds
 const INACTIVITY_CHECK_REPEAT_INTERVAL = 5; // in secs
-const SOUND_NOTIFICATION_FILE =
-  '/home/balajeerc/Projects/pomodoro-intrusive/sounds/back_to_work_notification.wav';
+const SOUND_NOTIFICATION_FILE = '../../sounds/back_to_work_notification.wav';
 // Threshold of inactive time above which we keep playing the
 // sound notification to return to/resume work
 const INACTIVITY_THRESHOLD_TIME = 30; // in secs
@@ -47,15 +46,15 @@ function* waitForActivity() {
     try {
       const timeSinceLastActivity = yield call(getTimeSinceLastActivity);
       if (timeSinceLastActivity > INACTIVITY_THRESHOLD_TIME * 1000) {
-        logger.nag.log('info', 'Playing notification to return to work');
+        logger.nag.info('Playing notification to return to work');
         yield cps(playSound, SOUND_NOTIFICATION_FILE);
       } else {
-        logger.nag.log('info', 'Activity detected. No more activity checking required.');
+        logger.nag.info('Activity detected. No more activity checking required.');
         break;
       }
       yield call(delay, INACTIVITY_CHECK_REPEAT_INTERVAL * 1000);
     } catch (error) {
-      logger.nag.log('error', `Malfunction when checking for activity: ${error}`);
+      logger.nag.error(`Malfunction when checking for activity: ${error}`);
       break; // break out of activity check since there is no point repeating check
     }
   }
@@ -67,7 +66,7 @@ function* lockScreenLoop() {
       logger.nag.info('Attempting to lock screen');
       yield call(lockScreen);
     } catch (error) {
-      logger.nag.log('error', `Error when attempting to call screenlock: ${error}`);
+      logger.nag.error(`Error when attempting to call screenlock: ${error}`);
     }
     yield call(delay, LOCK_SCREEN_REPEAT_INTERVAL * 1000);
   }
@@ -76,7 +75,7 @@ function* lockScreenLoop() {
 function* waitOnWork() {
   while (true) {
     yield take(WAIT_ON_WORK);
-    logger.nag.log('info', 'Now in WAIT_ON_WORK');
+    logger.nag.info('Now in WAIT_ON_WORK');
     const workInterval = () => {
       if (
         'pomodoroTimes' in config &&
@@ -86,8 +85,7 @@ function* waitOnWork() {
       ) {
         return config.pomodoroTimes.work;
       }
-      logger.nag.log(
-        'error',
+      logger.nag.error(
         'Improper configuration detected. Cannot find pomodoroTimes.work param. Using default: 25',
       );
       return DEFAULT_POMODORO_WORK_TIME;
@@ -100,7 +98,7 @@ function* waitOnWork() {
 function* waitOnBreak() {
   while (true) {
     yield take(WAIT_ON_BREAK);
-    logger.nag.log('info', 'Now in WAIT_ON_BREAK');
+    logger.nag.info('Now in WAIT_ON_BREAK');
     const breakInterval = () => {
       if (
         'pomodoroTimes' in config &&
@@ -110,8 +108,7 @@ function* waitOnBreak() {
       ) {
         return config.pomodoroTimes.break;
       }
-      logger.nag.log(
-        'error',
+      logger.nag.error(
         'Improper configuration detected. Cannot find pomodoroTimes.break param. Using default: 5',
       );
       return DEFAULT_POMODORO_BREAK_TIME;
@@ -120,12 +117,12 @@ function* waitOnBreak() {
     yield call(delay, breakInterval() * 60 * 1000);
     yield cancel(lockScreenLoopTask);
 
-    logger.nag.log('info', 'Unlocking screen after elapse of break');
+    logger.nag.info('Unlocking screen after elapse of break');
 
     try {
       yield call(unlockScreen);
     } catch (error) {
-      logger.nag.log('error', `Error when attempting to call screenUnlock: ${error}`);
+      logger.nag.error(`Error when attempting to call screenUnlock: ${error}`);
     }
     yield put(startActivityCheck());
   }
@@ -134,8 +131,8 @@ function* waitOnBreak() {
 function* transitionToWork() {
   while (true) {
     yield take(START_ACTIVITY_CHECK);
-    logger.nag.log('info', 'Now in TRANSITION_TO_WORK');
-    logger.nag.log('info', 'Waiting for activity');
+    logger.nag.info('Now in TRANSITION_TO_WORK');
+    logger.nag.info('Waiting for activity');
     yield call(waitForActivity);
     yield put(startWork());
   }
@@ -143,14 +140,14 @@ function* transitionToWork() {
 
 function* stopPomodoroTasks(tasks) {
   yield take(STOP_POMODORO_CYCLE);
-  logger.nag.log('info', 'Stopping pomodoro timing cycle');
+  logger.nag.info('Stopping pomodoro timing cycle');
   tasks.map(function* cancelTask(task) {
     yield cancel(task);
   });
 }
 
 export default function* startPomodoroCycle() {
-  logger.nag.log('info', 'Starting pomodoro timing cycle');
+  logger.nag.info('Starting pomodoro timing cycle');
   const waitOnWorkTask = yield fork(waitOnWork);
   const waitOnBreakTask = yield fork(waitOnBreak);
   const transitionToWorkTask = yield fork(transitionToWork);

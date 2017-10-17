@@ -18,6 +18,7 @@
  * All communication between this process and the intrusive-pomodoro
  * client is using UNIX signals
  */
+import 'babel-polyfill';
 import store from './stateStore';
 import { launch } from './actions';
 

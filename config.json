@@ -3,7 +3,7 @@
     "work": 25,
     "break": 5
   },
-  "messageQueue": {
-    "id": 29010
+  "tcp": {
+    "port": 29010
   }
 }

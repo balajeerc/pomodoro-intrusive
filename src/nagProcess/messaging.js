@@ -1,7 +1,7 @@
 /*
  * Saga that controls the messaging in the pomodoro-nag process
  *
- * Sets up to listen for Sys5 message queue for incoming control
+ * Sets up to listen for on a TCP socket incoming control
  * commands from the client app (pomodoro-intrusive)
  */
 import { call, take } from 'redux-saga/effects';
@@ -9,7 +9,7 @@ import { call, take } from 'redux-saga/effects';
 import logger from '../logger';
 import config from '../../config.json';
 
-import { createMessageQueue, createMessageChannel } from '../messageQueue';
+import { createServer, createListeningChannel } from '../tcpServer';
 import { SHUTDOWN_POMODORO_NAG } from '../controlCommands';
 
 /*
@@ -20,21 +20,21 @@ import { SHUTDOWN_POMODORO_NAG } from '../controlCommands';
 export default function* startMessaging(shutdownAction) {
   let messageChannel;
   try {
-    logger.nag.log('info', 'Registering message listener for control events');
-    const messageQueue = yield call(createMessageQueue, config.messageQueue.id);
-    messageChannel = yield call(createMessageChannel, messageQueue);
+    logger.nag.info('Registering message listener for control events');
+    const server = yield call(createServer, config.tcp.port);
+    messageChannel = yield call(createListeningChannel, server);
 
     while (true) {
-      const message = yield take(messageChannel);
-      logger.nag.log('info', `Recieved message: ${message}`);
-      if (message === SHUTDOWN_POMODORO_NAG) {
+      const incoming = yield take(messageChannel);
+      logger.nag.info(`Recieved message: ${incoming.message}`);
+      if (incoming.message === SHUTDOWN_POMODORO_NAG) {
         yield shutdownAction();
       }
     }
   } catch (err) {
-    logger.nag.log('error', 'Error when attempting to open message queue');
+    logger.nag.error('Error when attempting to open message queue');
   } finally {
     messageChannel.close();
-    logger.nag.log('info', 'Deregistering message listeners');
+    logger.nag.info('Deregistering message listeners');
   }
 }

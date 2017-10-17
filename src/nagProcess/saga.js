@@ -16,7 +16,7 @@ import startPomodoroCycle from './timerCycle';
  * Initiates the shutdown process
  */
 function* initiateShutdown() {
-  logger.nag.log('info', 'Initiating pomodoro nag shutdown...');
+  logger.nag.info('Initiating pomodoro nag shutdown...');
   yield put(shutdown());
 }
 
@@ -47,7 +47,7 @@ function* initiatePomodoroCycle() {
  */
 function* shutdownNagProcess() {
   yield take(SHUTDOWN);
-  logger.nag.log('info', 'Shutting down pomodoro nag process...');
+  logger.nag.info('Shutting down pomodoro nag process...');
   yield put(stopMessaging());
 }
 
@@ -55,10 +55,10 @@ function* shutdownNagProcess() {
  * Root saga for pomodoro nagger
  */
 function* nagProcess() {
-  logger.nag.log('info', 'Spawning pomodoro nag process...');
+  logger.nag.info('Spawning pomodoro nag process...');
   yield [fork(initiateMessaging), fork(initiatePomodoroCycle)];
   yield call(shutdownNagProcess);
-  logger.nag.log('info', 'pomodoro nag process shutdown complete');
+  logger.nag.info('pomodoro nag process shutdown complete');
   process.exit(0);
 }
 
