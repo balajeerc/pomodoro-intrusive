@@ -14,9 +14,11 @@ import { delay } from 'redux-saga';
 import { call, cancel, cps, fork, take, put } from 'redux-saga/effects';
 import soundPlay from 'play-sound';
 
-import config from '../../config.json';
+import config from '../configLoader';
 import { lockScreen, unlockScreen } from './screenLock';
 import getTimeSinceLastActivity from './activityCheck';
+
+import SOUND_NOTIFICATION_FILE from '../../sounds/back_to_work_notification.wav';
 
 import {
   STOP_POMODORO_CYCLE,
@@ -33,7 +35,6 @@ const DEFAULT_POMODORO_BREAK_TIME = 5; // in minutes
 // TODO: Make the following configurable using JSON
 const LOCK_SCREEN_REPEAT_INTERVAL = 5; // in seconds
 const INACTIVITY_CHECK_REPEAT_INTERVAL = 5; // in secs
-const SOUND_NOTIFICATION_FILE = '../../sounds/back_to_work_notification.wav';
 // Threshold of inactive time above which we keep playing the
 // sound notification to return to/resume work
 const INACTIVITY_THRESHOLD_TIME = 30; // in secs
@@ -78,12 +79,12 @@ function* waitOnWork() {
     logger.nag.info('Now in WAIT_ON_WORK');
     const workInterval = () => {
       if (
-        'pomodoroTimes' in config &&
-        'work' in config.pomodoroTimes &&
-        !Number.isNaN(parseFloat(config.pomodoroTimes.work)) &&
-        Number.isFinite(config.pomodoroTimes.work)
+        'pomodoroTimes' in config.pomodoro &&
+        'work' in config.pomodoro.pomodoroTimes &&
+        !Number.isNaN(parseFloat(config.pomodoro.pomodoroTimes.work)) &&
+        Number.isFinite(config.pomodoro.pomodoroTimes.work)
       ) {
-        return config.pomodoroTimes.work;
+        return config.pomodoro.pomodoroTimes.work;
       }
       logger.nag.error(
         'Improper configuration detected. Cannot find pomodoroTimes.work param. Using default: 25',
@@ -101,12 +102,12 @@ function* waitOnBreak() {
     logger.nag.info('Now in WAIT_ON_BREAK');
     const breakInterval = () => {
       if (
-        'pomodoroTimes' in config &&
-        'break' in config.pomodoroTimes &&
-        !Number.isNaN(parseFloat(config.pomodoroTimes.break)) &&
-        Number.isFinite(config.pomodoroTimes.break)
+        'pomodoroTimes' in config.pomodoro &&
+        'break' in config.pomodoro.pomodoroTimes &&
+        !Number.isNaN(parseFloat(config.pomodoro.pomodoroTimes.break)) &&
+        Number.isFinite(config.pomodoro.pomodoroTimes.break)
       ) {
-        return config.pomodoroTimes.break;
+        return config.pomodoro.pomodoroTimes.break;
       }
       logger.nag.error(
         'Improper configuration detected. Cannot find pomodoroTimes.break param. Using default: 5',

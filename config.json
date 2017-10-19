@@ -1,9 +1,0 @@
-{
-  "pomodoroTimes": {
-    "work": 25,
-    "break": 5
-  },
-  "tcp": {
-    "port": 29010
-  }
-}

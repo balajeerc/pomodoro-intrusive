@@ -7,7 +7,7 @@
 import { call, take } from 'redux-saga/effects';
 
 import logger from '../logger';
-import config from '../../config.json';
+import config from '../configLoader';
 
 import { createServer, createListeningChannel } from '../tcpServer';
 import { SHUTDOWN_POMODORO_NAG } from '../controlCommands';
@@ -21,7 +21,7 @@ export default function* startMessaging(shutdownAction) {
   let messageChannel;
   try {
     logger.nag.info('Registering message listener for control events');
-    const server = yield call(createServer, config.tcp.port);
+    const server = yield call(createServer, config.control.tcp.port);
     messageChannel = yield call(createListeningChannel, server);
 
     while (true) {

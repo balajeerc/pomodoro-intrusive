@@ -1,7 +1,7 @@
 /*
  * Utility to lock and unlock screen
  *
- * Uses the commands specified in lockCommand.json to do the actual lock/unlock
+ * Uses the commands specified in commandConfig.json to do the actual lock/unlock
  */
 
 import os from 'os';
@@ -9,8 +9,9 @@ import { exec } from 'child_process';
 import hasbin from 'hasbin';
 import { call, cps } from 'redux-saga/effects';
 
-import commandConfiguration from '../../lockCommand.json';
+import config from '../configLoader';
 
+const commandConfiguration = config.commands;
 /*
  * Returns a string containing the command to be run (with args concated in)
  * The choice is made on the command specified in command configuration specified
@@ -61,7 +62,7 @@ function* runScreenCommand(commandType) {
   const lockCmd = getLockCommand(commandConfiguration, commandType, os.platform(), hasbin.sync);
   if (!lockCmd) {
     throw new Error(
-      'Check config.json for lock command used and verify that it is compatible with your setup and that specified lock command is in PATH',
+      'Checkc commandConfig.json for lock command used and verify that it is compatible with your setup and that specified lock command is in PATH',
     );
   }
   yield cps(exec, lockCmd);

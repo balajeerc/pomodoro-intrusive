@@ -2,6 +2,7 @@ const path = require('path');
 
 module.exports = {
   target: 'node',
+  devtool: 'cheap-eval-src-map',
   entry: {
     'pomodoro-nag': './src/nagProcess/main.js',
     'pomodoro-intrusive': './src/client/pomodoro-intrusive.js',
@@ -12,7 +13,7 @@ module.exports = {
     libraryTarget: 'commonjs2',
   },
   resolve: {
-    extensions: ['.js', '.json'],
+    extensions: ['.js'],
     modules: [path.resolve('./src'), path.resolve('./node_modules')],
   },
   stats: {
@@ -42,12 +43,13 @@ module.exports = {
         },
       },
       {
-        test: /\.(png|jpg|gif|svg|wav)$/,
+        test: /\.(png|jpg|gif|svg|wav|json)$/,
         use: [
           {
             loader: 'file-loader',
             options: {
-              publicPath: '/dist/',
+              publicPath: 'dist/',
+              name: '[path][name].[ext]',
             },
           },
         ],

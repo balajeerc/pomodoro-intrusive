@@ -1,6 +1,6 @@
 {
-  "README":
-    "This file contains commands that will be used to lock screen. Override the defaults with whatever is applicable for your platform",
+  "INFO":
+    "This contains commands that will be used to lock screen. Override the defaults with whatever is applicable for your platform",
   "default": {
     "linux": {
       "lock": {
