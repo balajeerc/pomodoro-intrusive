@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const nagProcessPath = path.join(__dirname, 'dist/pomodoro-nag.js');
+console.log(nagProcessPath);
+
+const output = spawnSync('node', [nagProcessPath], { cwd: __dirname, stdio: ['inherit', 'inherit', 'inherit'] });
+console.log(JSON.stringify(output));

@@ -7,6 +7,10 @@
   "author": "Balajee Ramachandran",
   "license": "MIT",
   "private": false,
+  "bin": {
+    "pomodoro-intrusive": "pomodoro-intrusive",
+    "pomodoro-nag": "pomodoro-nag"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -25,6 +29,7 @@
     "webpack": "^3.8.0"
   },
   "scripts": {
+    "build": "webpack",
     "test": "cross-env NODE_ENV=test jest",
     "test:updateSnapshot": "cross-env NODE_ENV=test jest -u",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage"

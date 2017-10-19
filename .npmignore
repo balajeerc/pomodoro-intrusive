@@ -1,0 +1,10 @@
+src/
+tests/
+config/
+sounds/
+jest.config.js
+webpack.config.js
+.babelrc
+.eslintrc.json
+.prettierrc
+*.tgz

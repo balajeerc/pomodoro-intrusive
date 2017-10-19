@@ -1,5 +1,7 @@
 import { getLockCommand } from '../../src/nagProcess/screenLock';
-import defaultCommandConfig from '../../lockCommand.json';
+import config from '../../src/configLoader';
+
+const defaultCommandConfig = config.commands;
 
 // Dummy function that always returns true for any execpath
 // given to it
