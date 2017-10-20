@@ -5,7 +5,7 @@ module.exports = {
   devtool: 'cheap-eval-src-map',
   entry: {
     'pomodoro-nag': './src/nagProcess/main.js',
-    'pomodoro-intrusive': './src/client/pomodoro-intrusive.js',
+    'pomodoro-intrusive': './src/client/main.js',
   },
   output: {
     filename: '[name].js',

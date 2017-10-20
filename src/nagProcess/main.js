@@ -16,7 +16,7 @@
  * pomodoro loop again.
  *
  * All communication between this process and the intrusive-pomodoro
- * client is using UNIX signals
+ * client is using TCP socket
  */
 import 'babel-polyfill';
 import store from './stateStore';

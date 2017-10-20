@@ -1,3 +1,9 @@
-#!/usr/bin/env sh
+#!/usr/bin/env node
 
-node dist/pomodoro-intrusive.js
+const path = require('path');
+const { spawnSync } = require('child_process');
+
+const processPath = path.join(__dirname, 'dist/pomodoro-intrusive.js');
+
+spawnSync('node', [processPath, ...process.argv.slice(2), '--currentPath', __dirname], { cwd: __dirname, stdio: ['inherit', 'inherit', 'inherit'] });
+ 
