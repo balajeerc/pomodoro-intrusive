@@ -5,4 +5,4 @@ const { spawnSync } = require('child_process');
 
 const nagProcessPath = path.join(__dirname, 'dist/pomodoro-nag.js');
 
-spawnSync('node', [nagProcessPath], { cwd: __dirname, stdio: ['inherit', 'inherit', 'inherit'] });
+spawnSync('node', [nagProcessPath], { cwd: __dirname, stdio: ['inherit', 'inSherit', 'inherit'] });

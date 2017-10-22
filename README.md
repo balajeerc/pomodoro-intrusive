@@ -26,7 +26,7 @@ Here's what it does:
 
 ## <a name="motivation">Motivation</a>
 
-- Studies show that sitting for prolonged periods of time have a terrible effect on your lifespan. Taking breaks by getting up and moving around greatly alleviates the harms of sitting.
+- [Studies show](http://edition.cnn.com/2017/09/11/health/sitting-increases-risk-of-death-study/index.html) that sitting for prolonged periods of time have a terrible effect on your lifespan. Taking breaks by getting up and moving around [greatly alleviates the harms of sitting](http://edition.cnn.com/2015/08/06/health/how-to-move-more/index.html).
 - This was especially significant in my case, since I was struggling with back issues. Frequent breaks were made mandatory by my physio.
 - An ideal work discipline that helps with this is the 'pomodoro' technique.
 - Most pomodoro workflow utilities are non-intrusive... to the point where you forget about them. This was a deal breaker for me. In most cases, I just tune out the subtle notifications in my taskbar telling me to go take a break.
@@ -38,7 +38,7 @@ Here's what it does:
 
 ### Pre-requisites
 
-- node(v6.2+) with npm
+- node(v6.2+) with npm (On Ubuntu: `sudo apt-get install nodejs`)
 - gnome-screensaver-command (On Ubuntu: `sudo apt-get install gnome-screensaver`)
     - Note that you can use gnome-screensaver-command even when running other desktop environments (though this would involve pulling in a bunch of other gtk dependencies). I have gnome-screensaver-command installed though I use i3-wm as my window manager.
     - If you still feel you want it done the way YOUR setup needs it done, take a look at the configuration section.
@@ -54,10 +54,15 @@ npm install -g pomodoro-intrusive
 
 ```
 pomodoro-intrusive start            # Starts the pomodoro nag process
+pomodoro-intrusive stop             # Terminates the pomodoro nag process
+```
+
+### In the Pipeline but not yet implemented
+
+```
 pomodoro-intrusive restart:work     # Restarts the work time
 pomodoro-intrusive restart:break    # Restarts the break time
 pomodoro-intrusive status           # Prints current pomodoro nag status
-pomodoro-intrusive stop             # Terminates the pomodoro nag process
 ```
 
 ## <a name="configuration">Configuration</a>

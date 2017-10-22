@@ -1,3 +1,5 @@
+import { execSync } from 'child_process';
+
 import parseArgs from 'minimist';
 import 'babel-polyfill';
 
@@ -32,6 +34,20 @@ if (argv._.length === 0) {
 const subCommand = argv._[0];
 if (!(subCommand in supportedCommands)) {
   printUsage();
+  process.exit(1);
+}
+
+// TODO: The below forced termination is a nasty kludge done to push
+// out an alpha version. This must must replaced by a graceful shutdown
+// initiated by sending a SHUTDOWN command over TCP to the nag process
+if (subCommand === 'stop') {
+  try {
+    execSync(
+      "ps -eff | grep -v grep | grep pomodoro-nag | awk '{print $2}' | xargs kill -9 > /dev/null 2>&1",
+    );
+  } catch (_) {
+    console.error('No existing pomodoro nag process running.'); // eslint-disable-line no-console
+  }
   process.exit(1);
 }
 

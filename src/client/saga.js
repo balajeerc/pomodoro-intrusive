@@ -36,7 +36,7 @@ function* startNagProcessSpawner() {
     childProcess.spawn('node', [nagModulePath], { detached: true });
     // TODO: Figure out why removing the delay added below causes the child process to end
     // Does the parent process exiting too soon after spawning child end up closing child also?
-    yield delay(3000);
+    yield delay(1000);
     const hasChildSpawned = yield call(isPomodoroNagRunning);
     if (!hasChildSpawned) {
       console.error('Unable to spawn pomodoro nag process'); // eslint-disable-line no-console
