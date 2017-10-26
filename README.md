@@ -2,6 +2,8 @@
 
 > __NOTE: This is a work in progress. Please check back for when there is a release.__
 
+![Sgt. Pomodoro](sgt_pomodoro.png)
+
 pomodoro-intrusive is a utility that enforces the pomodoro discipline rather forcefully: by locking up your screen!
 Currently, it's only available for Linux and those of them with `gnome-screensaver-command` installed and functional.
 
