@@ -4,9 +4,10 @@
 
 import { LAUNCH, SPAWN_POMODORO_NAG, SHUTDOWN } from './constants';
 
-export function launch() {
+export function launch(command) {
   return {
     type: LAUNCH,
+    command,
   };
 }
 

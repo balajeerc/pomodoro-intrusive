@@ -28,6 +28,7 @@ import {
 } from './constants';
 import { startWork, startBreak, startActivityCheck } from './actions';
 import logger from '../logger';
+import { QUERY_POMODORO_NAG_STATUS, RESPONSE } from '../controlCommands';
 
 const DEFAULT_POMODORO_WORK_TIME = 25; // in minutes
 const DEFAULT_POMODORO_BREAK_TIME = 5; // in minutes
@@ -147,12 +148,22 @@ function* stopPomodoroTasks(tasks) {
   });
 }
 
+export function* echoCommand() {
+  while (true) {
+    logger.nag.info('Starting to listen for commands');
+    yield take(QUERY_POMODORO_NAG_STATUS);
+    logger.nag.info('Recieved query status request');
+    yield put({ type: RESPONSE, response: 'OK' });
+  }
+}
+
 export default function* startPomodoroCycle() {
   logger.nag.info('Starting pomodoro timing cycle');
   const waitOnWorkTask = yield fork(waitOnWork);
   const waitOnBreakTask = yield fork(waitOnBreak);
   const transitionToWorkTask = yield fork(transitionToWork);
+  const echoTask = yield fork(echoCommand);
 
   yield put(startWork());
-  yield stopPomodoroTasks([waitOnWorkTask, waitOnBreakTask, transitionToWorkTask]);
+  yield stopPomodoroTasks([waitOnWorkTask, waitOnBreakTask, transitionToWorkTask, echoTask]);
 }

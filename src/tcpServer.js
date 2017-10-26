@@ -1,3 +1,6 @@
+/*
+ * Saga wrappers around 'net' module's server
+ */
 import net from 'net';
 import { eventChannel } from 'redux-saga';
 
@@ -53,8 +56,8 @@ export function createListeningChannel(serverObject) {
     // the subscriber must return an unsubscribe function
     // this will be invoked when the saga calls `channel.close` method
     const unsubscribe = () => {
-      serverObject.connections.map(connection => {
-        connection.on('data', () => {});
+      Object.keys(serverObject.connections).map(connectionId => {
+        serverObject.connections[connectionId].on('data', () => {});
         return null;
       });
     };

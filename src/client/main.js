@@ -1,19 +1,25 @@
-import { execSync } from 'child_process';
-
 import parseArgs from 'minimist';
 import 'babel-polyfill';
 
 import store from './stateStore';
-import { launch, spawnPomodoroNag } from './actions';
+import { launch } from './actions';
+
+import {
+  SPAWN_POMODORO_NAG,
+  SHUTDOWN_POMODORO_NAG,
+  QUERY_POMODORO_NAG_STATUS,
+  RESTART_BREAK,
+  RESTART_WORK,
+} from '../controlCommands';
 
 const argv = parseArgs(process.argv.slice(2));
 
 const supportedCommands = {
-  start: 'Starts the pomodoro nag process',
-  'restart:work': 'Restarts the work time',
-  'restart:break': 'Restarts the break time',
-  status: 'Prints current pomodoro nag status',
-  stop: 'Terminates the pomodoro nag process',
+  start: { help: 'Starts the pomodoro nag process', command: SPAWN_POMODORO_NAG },
+  'restart:work': { help: 'Restarts the work time', command: RESTART_WORK },
+  'restart:break': { help: 'Restarts the break time', command: RESTART_BREAK },
+  status: { help: 'Prints current pomodoro nag status', command: QUERY_POMODORO_NAG_STATUS },
+  stop: { help: 'Terminates the pomodoro nag process', command: SHUTDOWN_POMODORO_NAG },
 };
 
 function printUsage() {
@@ -41,20 +47,7 @@ if (!(subCommand in supportedCommands)) {
 // out an alpha version. This must must replaced by a graceful shutdown
 // initiated by sending a SHUTDOWN command over TCP to the nag process
 if (subCommand === 'stop') {
-  try {
-    execSync(
-      "ps -eff | grep -v grep | grep pomodoro-nag | awk '{print $2}' | xargs kill -9 > /dev/null 2>&1",
-    );
-  } catch (_) {
-    console.error('No existing pomodoro nag process running.'); // eslint-disable-line no-console
-  }
   process.exit(1);
 }
 
-store.dispatch(launch());
-
-if (subCommand === 'start') {
-  // Dispatch an action to the application state machine to start
-  // process state machine
-  store.dispatch(spawnPomodoroNag());
-}
+store.dispatch(launch(supportedCommands[subCommand].command));
