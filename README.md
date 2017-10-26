@@ -13,6 +13,7 @@ Currently, it's only available for Linux and those of them with `gnome-screensav
 - [Running](#running)
 - [Configuration](#configuration)
 - [Roadmap](#roadmap)
+- [Credits](#credits)
 
 ## <a name="overview">Overview</a>
 
@@ -76,3 +77,7 @@ pomodoro-intrusive status           # Prints current pomodoro nag status
 
 - I wrote this over a weekend, so though initially I intended to be ambitious and target Windows and OSX as well, the overhead of figuring out the platform specific calls of automatic screen locking and unlocking were too overwhelming to tackle.
 - Drop me a mail/file an issue if you like this but need it for a different OS/desktop environment.
+
+## <a name="credits">Credits</a>
+
+- Sgt.Pomodoro graphic designed by Radhika Ayyangar
