@@ -43,11 +43,4 @@ if (!(subCommand in supportedCommands)) {
   process.exit(1);
 }
 
-// TODO: The below forced termination is a nasty kludge done to push
-// out an alpha version. This must must replaced by a graceful shutdown
-// initiated by sending a SHUTDOWN command over TCP to the nag process
-if (subCommand === 'stop') {
-  process.exit(1);
-}
-
 store.dispatch(launch(supportedCommands[subCommand].command));

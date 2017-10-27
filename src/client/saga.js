@@ -4,7 +4,7 @@
  * Basically the nerve centre of the nagger app, coordinating
  * incoming messages and corresponding state changes
  */
-
+import moment from 'moment';
 import { exec, spawn } from 'child_process';
 
 import { delay } from 'redux-saga';
@@ -12,11 +12,17 @@ import { call, take, cps, race } from 'redux-saga/effects';
 
 import config from '../configLoader';
 
+import { WAIT_ON_WORK, WAIT_ON_BREAK, START_ACTIVITY_CHECK } from '../pomodoroStates';
+
 import { LAUNCH } from './constants';
 import { connect, createSocketChannel, writeMessage } from './tcpSocket';
 import logger from '../logger';
 
-import { SPAWN_POMODORO_NAG, SHUTDOWN_POMODORO_NAG } from '../controlCommands';
+import {
+  SPAWN_POMODORO_NAG,
+  SHUTDOWN_POMODORO_NAG,
+  QUERY_POMODORO_NAG_STATUS,
+} from '../controlCommands';
 
 /*
  * Wraps string constant in an object with type param
@@ -26,6 +32,52 @@ function createCommand(commandType) {
   return {
     type: commandType,
   };
+}
+
+/*
+ * Processes the status query output into helpful human readable string
+ */
+function processQueryResponse(response) {
+  if ('error' in response) {
+    return { error: response.error };
+  }
+  try {
+    const parsedResponse = JSON.parse(response.response.message);
+    if (
+      typeof parsedResponse !== 'object' ||
+      !('response' in parsedResponse) ||
+      typeof parsedResponse.response !== 'object' ||
+      !('current' in parsedResponse.response) ||
+      !('since' in parsedResponse.response)
+    ) {
+      return { error: 'Malformatted response to status query from nag process' };
+    }
+    const currentState = (() => {
+      const startTime = moment(parsedResponse.response.since);
+      const now = moment();
+      const timeElapsed = now.diff(startTime, 'minutes');
+
+      if (parsedResponse.response.current === WAIT_ON_WORK) {
+        const timePending = config.pomodoro.pomodoroTimes.work - timeElapsed;
+        return {
+          response: `Waiting in work mode for the past: ${timeElapsed} minutes, pending: ${timePending} minutes`,
+        };
+      } else if (parsedResponse.response.current === WAIT_ON_BREAK) {
+        const timePending = config.pomodoro.pomodoroTimes.break - timeElapsed;
+        return {
+          response: `Waiting in break mode for the past: ${timeElapsed} minutes, pending: ${timePending} minutes`,
+        };
+      } else if (parsedResponse.response.current === START_ACTIVITY_CHECK) {
+        return {
+          response: `Waiting for activity, after break for the past: ${timeElapsed} minutes`,
+        };
+      }
+      return { error: 'Unhandled state value in query status response from pomodoro-nag' };
+    })();
+    return currentState;
+  } catch (parseError) {
+    return { error: `When parsing status query response: ${parseError}` };
+  }
 }
 
 function childProcessCall(func, args) {
@@ -109,18 +161,23 @@ function* isPomodoroNagRunning() {
  * Waits for commands to spawn nag processes
  */
 function* spawnPomodoroNag() {
+  const isNagRunning = yield call(isPomodoroNagRunning);
+  if (isNagRunning) {
+    outputResponseToConsole({ error: 'Pomodoro process is running already.' });
+    return;
+  }
+
   // do the spawning
   const nagModulePath = 'dist/pomodoro-nag.js';
   logger.client.info(`Spawning pomodoro nag process: ${nagModulePath}`);
-  yield childProcessCall(spawn, ['node', [nagModulePath], { detached: true }]);
-  // TODO: Figure out why removing the delay added below causes the child process to end
-  // Does the parent process exiting too soon after spawning child end up closing child also?
+  spawn('node', [nagModulePath], { detached: true, stdio: ['ignore', 'ignore', 'ignore'] });
   yield delay(1000);
   const hasChildSpawned = yield call(isPomodoroNagRunning);
   if (!hasChildSpawned) {
     console.error('Unable to spawn pomodoro nag process'); // eslint-disable-line no-console
   } else {
     logger.client.info('Successfully spawned pomodoro nag process');
+    outputResponseToConsole({ response: 'Spawned new Pomodoro process.' });
   }
 }
 
@@ -138,7 +195,11 @@ function* processCommand(command) {
   });
 
   if (response) {
-    outputResponseToConsole(response);
+    if (command === QUERY_POMODORO_NAG_STATUS) {
+      outputResponseToConsole(processQueryResponse(response));
+    } else {
+      outputResponseToConsole(response);
+    }
   } else {
     outputResponseToConsole({
       error:

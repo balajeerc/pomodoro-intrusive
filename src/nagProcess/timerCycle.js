@@ -156,10 +156,9 @@ export function* statusQueryHandler() {
     yield take(QUERY_POMODORO_NAG_STATUS);
     logger.nag.info('Recieved query status request');
     const mode = yield select(getPomodoroMode);
-    console.log('mode:' + JSON.stringify(mode));
     yield put({
       type: RESPONSE,
-      response: Object.assign({}, mode, { since: mode.since.toString() }),
+      response: Object.assign({}, mode, { since: mode.since.toISOString() }),
     });
   }
 }
