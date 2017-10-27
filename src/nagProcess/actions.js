@@ -9,10 +9,9 @@ import {
   STOP_POMODORO_CYCLE,
   START_LOCK_SCREEN_LOOP,
   STOP_LOCK_SCREEN_LOOP,
-  WAIT_ON_WORK,
-  WAIT_ON_BREAK,
-  START_ACTIVITY_CHECK,
 } from './constants';
+
+import { WAIT_ON_WORK, WAIT_ON_BREAK, START_ACTIVITY_CHECK } from '../pomodoroStates';
 
 export function launch() {
   return {

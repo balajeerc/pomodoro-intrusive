@@ -11,7 +11,7 @@
  *
  */
 import { delay } from 'redux-saga';
-import { call, cancel, cps, fork, take, put } from 'redux-saga/effects';
+import { call, cancel, cps, fork, take, put, select } from 'redux-saga/effects';
 import soundPlay from 'play-sound';
 
 import config from '../configLoader';
@@ -20,12 +20,10 @@ import getTimeSinceLastActivity from './activityCheck';
 
 import SOUND_NOTIFICATION_FILE from '../../sounds/back_to_work_notification.wav';
 
-import {
-  STOP_POMODORO_CYCLE,
-  WAIT_ON_WORK,
-  WAIT_ON_BREAK,
-  START_ACTIVITY_CHECK,
-} from './constants';
+import { STOP_POMODORO_CYCLE } from './constants';
+
+import { WAIT_ON_WORK, WAIT_ON_BREAK, START_ACTIVITY_CHECK } from '../pomodoroStates';
+
 import { startWork, startBreak, startActivityCheck } from './actions';
 import logger from '../logger';
 import { QUERY_POMODORO_NAG_STATUS, RESPONSE } from '../controlCommands';
@@ -42,6 +40,9 @@ const INACTIVITY_THRESHOLD_TIME = 30; // in secs
 
 const soundPlayer = soundPlay({});
 const playSound = soundPlayer.play.bind(soundPlayer);
+
+// Selector for pomodoro state
+const getPomodoroMode = state => state.pomodoroMode;
 
 function* waitForActivity() {
   while (true) {
@@ -115,6 +116,7 @@ function* waitOnBreak() {
       );
       return DEFAULT_POMODORO_BREAK_TIME;
     };
+
     const lockScreenLoopTask = yield fork(lockScreenLoop);
     yield call(delay, breakInterval() * 60 * 1000);
     yield cancel(lockScreenLoopTask);
@@ -148,12 +150,17 @@ function* stopPomodoroTasks(tasks) {
   });
 }
 
-export function* echoCommand() {
+export function* statusQueryHandler() {
   while (true) {
     logger.nag.info('Starting to listen for commands');
     yield take(QUERY_POMODORO_NAG_STATUS);
     logger.nag.info('Recieved query status request');
-    yield put({ type: RESPONSE, response: 'OK' });
+    const mode = yield select(getPomodoroMode);
+    console.log('mode:' + JSON.stringify(mode));
+    yield put({
+      type: RESPONSE,
+      response: Object.assign({}, mode, { since: mode.since.toString() }),
+    });
   }
 }
 
@@ -162,7 +169,7 @@ export default function* startPomodoroCycle() {
   const waitOnWorkTask = yield fork(waitOnWork);
   const waitOnBreakTask = yield fork(waitOnBreak);
   const transitionToWorkTask = yield fork(transitionToWork);
-  const echoTask = yield fork(echoCommand);
+  const echoTask = yield fork(statusQueryHandler);
 
   yield put(startWork());
   yield stopPomodoroTasks([waitOnWorkTask, waitOnBreakTask, transitionToWorkTask, echoTask]);

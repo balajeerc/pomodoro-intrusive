@@ -39,6 +39,7 @@
     "bunyan": "^1.8.12",
     "hasbin": "^1.2.3",
     "minimist": "^1.2.0",
+    "moment": "^2.19.1",
     "play-sound": "^1.1.1",
     "redux": "^3.7.2",
     "redux-saga": "^0.15.6"
