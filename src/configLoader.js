@@ -37,6 +37,8 @@ function loadConfig() {
       if (typeof entry.json === 'string') {
         const fileContents = fs.readFileSync(entry.json);
         const parsedJSON = JSON.parse(fileContents);
+        // TODO: Add JSON schema based validation of config files.
+        // Terminate app if schema validation fails.
         return Object.assign({}, consolidatedConfig, { [entry.name]: parsedJSON });
       }
       return Object.assign({}, consolidatedConfig, { [entry.name]: entry.json });

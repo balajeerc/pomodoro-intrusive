@@ -4,7 +4,6 @@
  * Basically the nerve centre of the nagger app, coordinating
  * incoming messages and corresponding state changes
  */
-import moment from 'moment';
 import { exec, spawn } from 'child_process';
 
 import { delay } from 'redux-saga';
@@ -15,7 +14,7 @@ import config from '../configLoader';
 import { WAIT_ON_WORK, WAIT_ON_BREAK, START_ACTIVITY_CHECK } from '../pomodoroStates';
 
 import { LAUNCH } from './constants';
-import { connect, createSocketChannel, writeMessage } from './tcpSocket';
+import { connect, createSocketChannel, writeMessage } from '../tcpSocket';
 import logger from '../logger';
 
 import {
@@ -48,28 +47,23 @@ function processQueryResponse(response) {
       !('response' in parsedResponse) ||
       typeof parsedResponse.response !== 'object' ||
       !('current' in parsedResponse.response) ||
-      !('since' in parsedResponse.response)
+      !('since' in parsedResponse.response) ||
+      !('pending' in parsedResponse.response)
     ) {
       return { error: 'Malformatted response to status query from nag process' };
     }
     const currentState = (() => {
-      const startTime = moment(parsedResponse.response.since);
-      const now = moment();
-      const timeElapsed = now.diff(startTime, 'minutes');
-
       if (parsedResponse.response.current === WAIT_ON_WORK) {
-        const timePending = config.pomodoro.pomodoroTimes.work - timeElapsed;
         return {
-          response: `Waiting in work mode for the past: ${timeElapsed} minutes, pending: ${timePending} minutes`,
+          response: `Waiting in work mode, pending: ${parsedResponse.response.pending} minutes`,
         };
       } else if (parsedResponse.response.current === WAIT_ON_BREAK) {
-        const timePending = config.pomodoro.pomodoroTimes.break - timeElapsed;
         return {
-          response: `Waiting in break mode for the past: ${timeElapsed} minutes, pending: ${timePending} minutes`,
+          response: `Waiting in break mode, pending: ${parsedResponse.response.pending} minutes`,
         };
       } else if (parsedResponse.response.current === START_ACTIVITY_CHECK) {
         return {
-          response: `Waiting for activity, after break for the past: ${timeElapsed} minutes`,
+          response: 'Waiting for user activity to resume after break',
         };
       }
       return { error: 'Unhandled state value in query status response from pomodoro-nag' };
@@ -111,7 +105,7 @@ function childProcessCall(func, args) {
 function* request(commandType) {
   try {
     const command = createCommand(commandType);
-    const connection = yield call(connect, config.control.tcp.port, '127.0.0.1', 3000);
+    const connection = yield call(connect, config.control.command.port, '127.0.0.1', 3000);
     const messageChannel = yield call(createSocketChannel, connection);
     yield call(writeMessage, connection, JSON.stringify(command));
     const response = yield take(messageChannel);

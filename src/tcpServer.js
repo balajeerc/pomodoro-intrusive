@@ -71,7 +71,7 @@ export function writeMessage(serverObject, message, targetId) {
     if (targetId && targetId in serverObject.connections) {
       return [serverObject.connections[targetId]];
     }
-    return serverObject.connections;
+    return Object.keys(serverObject.connections).map(key => serverObject.connections[key]);
   })();
   const writes = destConnections.map(
     connection =>

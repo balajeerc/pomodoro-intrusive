@@ -1,11 +1,14 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
   target: 'node',
   devtool: 'cheap-eval-src-map',
+  externals: [nodeExternals()],
   entry: {
     'pomodoro-nag': './src/nagProcess/main.js',
     'pomodoro-intrusive': './src/client/main.js',
+    'pomodoro-screenlock': './src/screenLock/main.js',
   },
   output: {
     filename: '[name].js',

@@ -1,5 +1,8 @@
 {
-  "tcp": {
+  "command": {
     "port": 29011
+  },
+  "screenLock": {
+    "port": 29012
   }
 }

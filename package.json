@@ -2,7 +2,6 @@
   "name": "pomodoro-intrusive",
   "version": "0.0.1",
   "description": "Intrusive commandline pomodoro utility that locks you out of your screen!",
-  "main": "pomodoro-intrusive.js",
   "repository": "git@github.com:balajeerc/pomodoro-intrusive.git",
   "author": "Balajee Ramachandran",
   "license": "MIT",
@@ -37,11 +36,13 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "bunyan": "^1.8.12",
+    "electron": "^1.7.9",
     "hasbin": "^1.2.3",
     "minimist": "^1.2.0",
     "moment": "^2.19.1",
     "play-sound": "^1.1.1",
     "redux": "^3.7.2",
-    "redux-saga": "^0.15.6"
+    "redux-saga": "^0.15.6",
+    "webpack-node-externals": "^1.6.0"
   }
 }

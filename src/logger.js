@@ -46,6 +46,7 @@ function createLogger(appName, logFilePrefix) {
 const logger = {
   client: createLogger('pomodoro-intrusive', '/tmp/pomodoro-intrusive'),
   nag: createLogger('pomodoro-nag', '/tmp/pomodoro-nag'),
+  screenLock: createLogger('pomodoro-screenLock', '/tmp/pomodoro-screenLock'),
 };
 
 export default logger;

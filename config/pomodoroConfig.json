@@ -1,6 +1,9 @@
 {
   "pomodoroTimes": {
-    "work": 25,
-    "break": 5
+    "work": 0.2,
+    "break": 0.2
+  },
+  "screenLock": {
+    "checkInterval": 3
   }
 }
