@@ -4,8 +4,8 @@
 
 ![Sgt. Pomodoro](sgt_pomodoro.png)
 
-pomodoro-intrusive is a utility that enforces the pomodoro discipline rather forcefully: by locking up your screen!
-Currently, it's only available for Linux and those of them with `gnome-screensaver-command` installed and functional.
+pomodoro-intrusive is a cross-platform utility that enforces the pomodoro discipline rather forcefully: by locking up your screen!
+Currently, it is available for Linux, OSX and Windows.
 
 - [Overview](#overview)
 - [Motivation](#motivation)
@@ -19,35 +19,32 @@ Currently, it's only available for Linux and those of them with `gnome-screensav
 
 Here's what it does:
 
-1) On running pomodoro-intrusive, it forks off a background process called the pomodoro-nag.
+1) On starting pomodoro-intrusive, it forks off a background process called the pomodoro-nag.
 2) pomodoro-nag waits for a specified time time of work (default: 25 mins)
-3) It then locks your screen!
-4) That's not all. Really annoyingly, during the duration of the break period (default: 5 mins) it repeatedly keeps locking your screen up. It's not called intrusive for nothing.
+3) It then locks your screen! (Basically, shows a full screen window that is always on top of other windows.) You could try closing this, but...
+4) During the duration of the break period (default: 5 mins), it repeatedly re-launches the lock screen window if it is closed. Hey, it's not called __intrusive__ for nothing!
 5) After the break period, it opens up your screen. But that's not all...
-6) After unlocking your screen, it keeps monitoring for mouse/keyboard activity. If it doesn't detect any, it is most probably because you left your workstation and are wasting time on Twitter. So helpfully, pomodoro-nag periodically plays a sound alerting you to GET BACK TO WORK!
-7) Once it detects that you're back at work, it resumes the work timer.
+6) After unlocking your screen, it keeps monitoring for mouse/keyboard activity. If it doesn't detect any, it is most probably because you left your workstation (and are wasting time checking your Twitter feed using your phone). So helpfully, pomodoro-nag periodically plays a sound alerting you to GET BACK TO WORK!
+7) Once it detects a few keystrokes/mouse activity, it closes the screen lock and resumes the work timer. 
+8) Rinse and repeat cycle.
 
 ## <a name="motivation">Motivation</a>
 
-- [Studies show](http://edition.cnn.com/2017/09/11/health/sitting-increases-risk-of-death-study/index.html) that sitting for prolonged periods of time have a terrible effect on your lifespan. Taking breaks by getting up and moving around [greatly alleviates the harms of sitting](http://edition.cnn.com/2015/08/06/health/how-to-move-more/index.html).
+- [Studies show](http://annals.org/aim/article-abstract/2653704/patterns-sedentary-behavior-mortality-u-s-middle-aged-older-adults) that sitting for prolonged periods of time has a terrible effect on your lifespan. Taking frequent breaks by getting up and moving around [significantly alleviates the harms of sitting](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3404815/).
 - This was especially significant in my case, since I was struggling with back issues. Frequent breaks were made mandatory by my physio.
 - An ideal work discipline that helps with this is the 'pomodoro' technique.
-- Most pomodoro workflow utilities are non-intrusive... to the point where you forget about them. This was a deal breaker for me. In most cases, I just tune out the subtle notifications in my taskbar telling me to go take a break.
+- Most pomodoro workflow utilities are non-intrusive... to the point where you forget about them. This was a deal breaker for me since I just tune out the subtle notifications in my taskbar telling me to go take a break.
 - Moreover, these pomodoro utilities need to be manually restarted when you resume work. Most of the time, I just used to forget to do that.
 - pomodoro technique is awesome, but the tools available to enforce this were far from adequate.
-- This tool is an attempt at solving the problems stated above.
+- This tool is an attempt at solving these problems and enforcing a proper pomodoro discipline.
 
 ## <a name="installation">Installation</a>
 
 ### Pre-requisites
 
-- node(v6.2+) with npm (On Ubuntu: `sudo apt-get install nodejs`)
-- gnome-screensaver-command (On Ubuntu: `sudo apt-get install gnome-screensaver`)
-    - Note that you can use gnome-screensaver-command even when running other desktop environments (though this would involve pulling in a bunch of other gtk dependencies). I have gnome-screensaver-command installed though I use i3-wm as my window manager.
-    - If you still feel you want it done the way YOUR setup needs it done, take a look at the configuration section.
-- xprintidle (On Ubuntu: `sudo apt-get install xprintidle`)
+- node(v4.7+) with npm (On Ubuntu: `sudo apt-get install nodejs`)
 
-### Downloading from npm
+### Download app from npm
 
 ```
 npm install -g pomodoro-intrusive
@@ -58,6 +55,7 @@ npm install -g pomodoro-intrusive
 ```
 pomodoro-intrusive start            # Starts the pomodoro nag process
 pomodoro-intrusive stop             # Terminates the pomodoro nag process
+pomodoro-intrusive status           # Prints current pomodoro nag status
 ```
 
 ### In the Pipeline but not yet implemented
@@ -65,18 +63,17 @@ pomodoro-intrusive stop             # Terminates the pomodoro nag process
 ```
 pomodoro-intrusive restart:work     # Restarts the work time
 pomodoro-intrusive restart:break    # Restarts the break time
-pomodoro-intrusive status           # Prints current pomodoro nag status
 ```
 
 ## <a name="configuration">Configuration</a>
 
-- Configuration of the parameters such as the pomodoro activity intervals can be done by editing `config.json`.
-- Configruation/overriding of the screen locking mechanism can be achieved by editing `lockCommand.json`.
+- Configuration of the parameters such as the pomodoro activity intervals can be done by editing `<installation_dir>/dist/pomodoroConfig.json`.
 
 ## <a name="roadmap">Roadmap</a>
 
-- I wrote this over a weekend, so though initially I intended to be ambitious and target Windows and OSX as well, the overhead of figuring out the platform specific calls of automatic screen locking and unlocking were too overwhelming to tackle.
-- Drop me a mail/file an issue if you like this but need it for a different OS/desktop environment.
+- Standalone installers/zip packages for Windows and OSX.
+- Systray icon and menu to perform the various actions currently accessible only from commandline.
+- GUI to configure options rather than having to edit the configuration files manually.
 
 ## <a name="credits">Credits</a>
 
