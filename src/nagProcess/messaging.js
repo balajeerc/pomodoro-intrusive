@@ -27,20 +27,28 @@ export function* statusQueryHandler() {
     yield take(QUERY_POMODORO_NAG_STATUS);
     logger.nag.info('Recieved query status request');
     const mode = yield select(getPomodoroMode);
-    const pending = (() => {
+
+    const timeStats = (() => {
       const startTime = moment(mode.since);
       const now = moment();
       const timeElapsed = now.diff(startTime, 'minutes');
       if (mode.current === WAIT_ON_WORK) {
-        return config.pomodoro.pomodoroTimes.work - timeElapsed;
+        return {
+          pending: config.pomodoro.pomodoroTimes.work - timeElapsed,
+          interval: config.pomodoro.pomodoroTimes.work,
+        };
       } else if (mode.current === WAIT_ON_BREAK) {
-        return config.pomodoro.pomodoroTimes.break - timeElapsed;
+        return {
+          pending: config.pomodoro.pomodoroTimes.break - timeElapsed,
+          interval: config.pomodoro.pomodoroTimes.work,
+        };
       }
       return Infinity;
     })();
+
     yield put({
       type: RESPONSE,
-      response: Object.assign({}, mode, { since: mode.since.toISOString(), pending }),
+      response: Object.assign({}, mode, { since: mode.since.toISOString() }, timeStats),
     });
   }
 }
