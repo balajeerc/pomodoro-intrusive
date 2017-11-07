@@ -9,6 +9,7 @@ module.exports = {
     'pomodoro-nag': './src/nagProcess/main.js',
     'pomodoro-intrusive': './src/client/main.js',
     'pomodoro-screenlock': './src/screenLock/main.js',
+    'pomodoro-screenlock-renderer': './src/screenLock/renderer.js',
   },
   output: {
     filename: '[name].js',
