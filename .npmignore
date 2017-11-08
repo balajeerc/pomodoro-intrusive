@@ -8,3 +8,4 @@ webpack.config.js
 .eslintrc.json
 .prettierrc
 *.tgz
+tags

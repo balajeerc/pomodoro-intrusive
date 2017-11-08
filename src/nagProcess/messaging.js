@@ -45,7 +45,7 @@ export function* statusQueryHandler() {
       } else if (mode.current === WAIT_ON_BREAK) {
         return {
           pending: config.pomodoro.pomodoroTimes.break - timeElapsed,
-          interval: config.pomodoro.pomodoroTimes.work,
+          interval: config.pomodoro.pomodoroTimes.break,
         };
       }
       return Infinity;

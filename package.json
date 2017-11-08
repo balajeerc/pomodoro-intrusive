@@ -1,6 +1,6 @@
 {
   "name": "pomodoro-intrusive",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Intrusive commandline pomodoro utility that locks you out of your screen!",
   "repository": "git@github.com:balajeerc/pomodoro-intrusive.git",
   "author": "Balajee Ramachandran",
@@ -34,7 +34,8 @@
     "lint": "eslint src",
     "test": "cross-env NODE_ENV=test jest",
     "test:updateSnapshot": "cross-env NODE_ENV=test jest -u",
-    "test:coverage": "cross-env NODE_ENV=test jest --coverage"
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage",
+    "prepack": "cp src/screenLock/index.html dist"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
