@@ -3,12 +3,21 @@
   <head>
     <meta charset="UTF-8">
     <title>Pomodoro Lock Screen</title>
+    <style type="text/css">
+        #container {  
+            height:100%;
+            width:100%;
+        }
+    </style>
   </head>
   <body>
-    <h1>Pomodoro Intrusive has locked your screen!</h1><br />
-    <h3>Time before screen unlocks</h2>
+    <h1 id="main-caption">Pomodoro Intrusive has locked your screen!</h1><br />
+    <h3 id="label">Time before screen unlocks</h2>
     <h2 id="pending-time"></h2>
     <script src="pomodoro-screenlock-renderer.js"></script>
+    <script>
+      document.onkeydown = onScreenActivity;
+    </script>
   </body>
 </html>
 

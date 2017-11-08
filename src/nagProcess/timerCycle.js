@@ -16,22 +16,20 @@ import soundPlay from 'play-sound';
 
 import config from '../configLoader';
 import lockScreenLoop from './screenLockControl';
-import getTimeSinceLastActivity from './activityCheck';
-
+import logger from '../logger';
 import SOUND_NOTIFICATION_FILE from '../../sounds/back_to_work_notification.wav';
-
-import { STOP_POMODORO_CYCLE } from './constants';
-
+import {
+  RESPONSE,
+  SCREENLOCK_WAIT_FOR_ACTIVITY,
+  SCREENLOCK_DETECTED_ACTIVITY,
+} from '../controlCommands';
 import { WAIT_ON_WORK, WAIT_ON_BREAK, START_ACTIVITY_CHECK } from '../pomodoroStates';
 
+import { STOP_POMODORO_CYCLE } from './constants';
 import { startWork, startBreak, startActivityCheck } from './actions';
-import logger from '../logger';
 
 // TODO: Make the following configurable using JSON
 const INACTIVITY_CHECK_REPEAT_INTERVAL = 5; // in secs
-// Threshold of inactive time above which we keep playing the
-// sound notification to return to/resume work
-const INACTIVITY_THRESHOLD_TIME = 30; // in secs
 
 const soundPlayer = soundPlay({});
 const playSound = soundPlayer.play.bind(soundPlayer);
@@ -39,17 +37,11 @@ const playSound = soundPlayer.play.bind(soundPlayer);
 function* waitForActivity() {
   while (true) {
     try {
-      const timeSinceLastActivity = yield call(getTimeSinceLastActivity);
-      if (timeSinceLastActivity > INACTIVITY_THRESHOLD_TIME * 1000) {
-        logger.nag.info('Playing notification to return to work');
-        yield cps(playSound, SOUND_NOTIFICATION_FILE);
-      } else {
-        logger.nag.info('Activity detected. No more activity checking required.');
-        break;
-      }
+      logger.nag.info('Playing notification to return to work');
+      yield cps(playSound, SOUND_NOTIFICATION_FILE);
       yield call(delay, INACTIVITY_CHECK_REPEAT_INTERVAL * 1000);
     } catch (error) {
-      logger.nag.error(`Malfunction when checking for activity: ${error}`);
+      logger.nag.error(`Malfunction when playing sound after break: ${error}`);
       break; // break out of activity check since there is no point repeating check
     }
   }
@@ -73,18 +65,31 @@ function* waitOnBreak() {
     const lockScreenLoopTask = yield fork(lockScreenLoop);
     yield call(delay, config.pomodoro.pomodoroTimes.break * 60 * 1000);
     logger.nag.info('Unlocking screen after elapse of break');
-    yield cancel(lockScreenLoopTask);
 
-    yield put(startActivityCheck());
+    yield put(startActivityCheck(lockScreenLoopTask));
   }
 }
 
 function* transitionToWork() {
   while (true) {
-    yield take(START_ACTIVITY_CHECK);
+    const activityCheckCommand = yield take(START_ACTIVITY_CHECK);
+
     logger.nag.info('Now in TRANSITION_TO_WORK');
     logger.nag.info('Waiting for activity');
-    yield call(waitForActivity);
+
+    yield put({ type: SCREENLOCK_WAIT_FOR_ACTIVITY });
+
+    const soundPlayLoop = yield fork(waitForActivity);
+    yield take(SCREENLOCK_DETECTED_ACTIVITY);
+    logger.nag.info('Detected activity. Closing screenlock');
+    yield put({
+      type: RESPONSE,
+      response: 'OK',
+    });
+
+    yield cancel(activityCheckCommand.screenLockTask);
+    yield cancel(soundPlayLoop);
+
     yield put(startWork());
   }
 }

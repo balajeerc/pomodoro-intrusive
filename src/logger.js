@@ -1,7 +1,7 @@
 import bunyan from 'bunyan';
 import fs from 'fs';
 
-const LOG_DELIMITER = '--------------------------------------------';
+const LOG_DELIMITER = '\n--------------------------------------------\n';
 
 function createLogger(appName, logFilePrefix) {
   // If we're not in production then log to the `console` with the format:

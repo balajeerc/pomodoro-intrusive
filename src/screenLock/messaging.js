@@ -2,23 +2,30 @@ import { eventChannel } from 'redux-saga';
 import { call, cancel, fork, take, put, select } from 'redux-saga/effects';
 import electron from 'electron';
 
-import { RESPONSE } from '../controlCommands';
+import {
+  RESPONSE,
+  QUERY_POMODORO_NAG_STATUS,
+  SCREENLOCK_WAIT_FOR_ACTIVITY,
+  SCREENLOCK_DETECTED_ACTIVITY,
+} from '../controlCommands';
 import logger from '../logger';
 import { connect, createSocketChannel, writeMessage } from '../tcpSocket';
 import config from '../configLoader';
 
-import { REQUEST, ELECTRON_IPC_CHANNEL } from './constants';
+import { ELECTRON_IPC_CHANNEL } from './constants';
 
 /*
  * Saga that relays commands/requests to pomodoro-nag
  */
-export function* messageSender(connection) {
+export function* messageSender(connection, commandType) {
   logger.screenLock.info('Listening for requests to send to nag process process');
   while (true) {
     try {
       // TODO: Schema validate incoming requests
-      const request = yield take(REQUEST);
-      yield call(writeMessage, connection, JSON.stringify(request.message));
+      const request = yield take(commandType);
+      const requestStr = JSON.stringify(request);
+      logger.screenLock.info(`Sending to nag process: ${requestStr}`);
+      yield call(writeMessage, connection, requestStr);
     } catch (err) {
       logger.screenLock.error(`When attempting to send request to pomodoro-nag: ${err}`);
     }
@@ -34,7 +41,11 @@ export function* startNagMessaging() {
     const connection = yield call(connect, config.control.screenLock.port, '127.0.0.1', 3000);
     const messageChannel = yield call(createSocketChannel, connection);
 
-    requestListener = yield fork(messageSender, connection);
+    requestListener = yield [
+      fork(messageSender, connection, QUERY_POMODORO_NAG_STATUS),
+      fork(messageSender, connection, SCREENLOCK_DETECTED_ACTIVITY),
+    ];
+
     while (true) {
       try {
         const response = yield take(messageChannel);
@@ -83,13 +94,15 @@ function createElectronIPCChannel() {
 const getMainWindow = state => state.mainWindow;
 
 /*
- * Relays status query response from pomodoro-nag to renderer
+ * Starts a saga that repeatedly relays commands/actions to renderer process
  */
-function* statusQueryResponseHandler() {
+function* startCommandRelay(commandType) {
   while (true) {
-    const statusQueryResponse = yield take(RESPONSE);
+    const command = yield take(commandType);
     const mainWindow = yield select(getMainWindow);
-    mainWindow.webContents.send(ELECTRON_IPC_CHANNEL, JSON.stringify(statusQueryResponse));
+    const commandStr = JSON.stringify(command);
+    logger.screenLock.info(`Relaying command: ${commandStr} to renderer`);
+    mainWindow.webContents.send(ELECTRON_IPC_CHANNEL, commandStr);
   }
 }
 
@@ -97,13 +110,17 @@ function* statusQueryResponseHandler() {
  * Saga on which screenLock main process listens for incoming requests from renderer process
  */
 export function* startRendererMessaging() {
-  const statusQueryHandlerSaga = yield fork(statusQueryResponseHandler);
+  const commandRelays = yield [
+    fork(startCommandRelay, RESPONSE),
+    fork(startCommandRelay, SCREENLOCK_WAIT_FOR_ACTIVITY),
+  ];
   try {
     const ipcMessageChannel = yield call(createElectronIPCChannel);
     while (true) {
       try {
         const incoming = yield take(ipcMessageChannel);
         const incomindParsed = JSON.parse(incoming);
+        logger.screenLock.info(`Recieved from renderer: ${incoming}`);
         yield put(incomindParsed);
       } catch (messagingError) {
         logger.screenLock.error(
@@ -116,6 +133,6 @@ export function* startRendererMessaging() {
     // This is a fatal error, terminate screenlock
     process.exit(1);
   } finally {
-    yield cancel(statusQueryHandlerSaga);
+    yield cancel(commandRelays);
   }
 }

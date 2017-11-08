@@ -61,8 +61,9 @@ export function startBreak() {
   };
 }
 
-export function startActivityCheck() {
+export function startActivityCheck(screenLockTask) {
   return {
     type: START_ACTIVITY_CHECK,
+    screenLockTask,
   };
 }

@@ -34,9 +34,9 @@ function createWindow() {
       titleBarStyle: 'hidden',
       autoHideMenuBar: true,
       alwaysOnTop: true,
-      //    focusable: false,
       fullscreen: true,
     });
+    mainWindow.setVisibleOnAllWorkspaces(true);
 
     // and load the index.html of the app.
     mainWindow.loadURL(
