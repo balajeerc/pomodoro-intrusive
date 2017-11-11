@@ -2,7 +2,9 @@ import electron from 'electron';
 import moment from 'moment';
 
 import logger from '../logger';
-import { RESPONSE, SCREENLOCK_WAIT_FOR_ACTIVITY } from '../controlCommands';
+import { RESPONSE } from '../controlCommands';
+import { START_ACTIVITY_CHECK } from '../pomodoroStates';
+
 import { createPomodoroStatusRequest, screenLockDetectedActivity } from './actions';
 import { ELECTRON_IPC_CHANNEL } from './constants';
 
@@ -24,17 +26,19 @@ electron.ipcRenderer.send(ELECTRON_IPC_CHANNEL, JSON.stringify(createPomodoroSta
 
 electron.ipcRenderer.on(ELECTRON_IPC_CHANNEL, (event, data) => {
   const command = JSON.parse(data);
+  logger.screenLock.info(`Renderer recieved command: ${data}`);
   switch (command.type) {
     case RESPONSE: {
       const nagStatus = command;
       startTime = moment(nagStatus.response.since);
       currentInterval = nagStatus.response.interval;
-      break;
-    }
-    case SCREENLOCK_WAIT_FOR_ACTIVITY: {
-      logger.screenLock.info('Recieved check activity command');
-      // eslint-disable-next-line no-undef
-      document.getElementById('main-caption').innerHTML = 'Press any key to unlock screen';
+      logger.screenLock.info(`State to match to: ${START_ACTIVITY_CHECK}`);
+      logger.screenLock.info(`Current state: ${nagStatus.response.current}`);
+      if (nagStatus.response.current === START_ACTIVITY_CHECK) {
+        logger.screenLock.info('Recieved check activity command');
+        // eslint-disable-next-line no-undef
+        document.getElementById('main-caption').innerHTML = 'Press any key to unlock screen';
+      }
       break;
     }
     default:

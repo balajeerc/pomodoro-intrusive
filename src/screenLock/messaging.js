@@ -5,7 +5,6 @@ import electron from 'electron';
 import {
   RESPONSE,
   QUERY_POMODORO_NAG_STATUS,
-  SCREENLOCK_WAIT_FOR_ACTIVITY,
   SCREENLOCK_DETECTED_ACTIVITY,
 } from '../controlCommands';
 import logger from '../logger';
@@ -103,6 +102,9 @@ function* startCommandRelay(commandType) {
     const commandStr = JSON.stringify(command);
     logger.screenLock.info(`Relaying command: ${commandStr} to renderer`);
     mainWindow.webContents.send(ELECTRON_IPC_CHANNEL, commandStr);
+    // Some commands, such as HALT_SCREENLOCK need to be handled internally
+    // by the renderer process. So relay it as an action.
+    yield put(command);
   }
 }
 
@@ -110,10 +112,9 @@ function* startCommandRelay(commandType) {
  * Saga on which screenLock main process listens for incoming requests from renderer process
  */
 export function* startRendererMessaging() {
-  const commandRelays = yield [
-    fork(startCommandRelay, RESPONSE),
-    fork(startCommandRelay, SCREENLOCK_WAIT_FOR_ACTIVITY),
-  ];
+  // Create a saga for each of the commands we need to relay
+  // to the renderer process
+  const commandRelays = yield [fork(startCommandRelay, RESPONSE)];
   try {
     const ipcMessageChannel = yield call(createElectronIPCChannel);
     while (true) {

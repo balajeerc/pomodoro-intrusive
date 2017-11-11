@@ -7,10 +7,10 @@ import path from 'path';
 import url from 'url';
 
 import { delay } from 'redux-saga';
-import { call, cancel, fork, take, put } from 'redux-saga/effects';
+import { call, cancel, fork, take, put, race } from 'redux-saga/effects';
 import electron from 'electron';
 
-import { HALT_SCREENLOCK } from '../controlCommands';
+import { HALT_SCREENLOCK, SCREENLOCK_WAIT_FOR_ACTIVITY } from '../controlCommands';
 import logger from '../logger';
 
 import { LAUNCH } from './constants';
@@ -18,6 +18,10 @@ import { LAUNCH } from './constants';
 import { startNagMessaging, startRendererMessaging } from './messaging';
 import { registerMainWindow } from './actions';
 
+/*
+ * Creates a full screen window that is visible on all workspaces
+ * @param boolean allowFocus   Specifies whether window should allow focus
+ */
 function createWindow() {
   let mainWindow;
   const promise = new Promise(resolve => {
@@ -53,7 +57,11 @@ function createWindow() {
     mainWindow.on('ready-to-show', () => {});
 
     mainWindow.on('close', () => {
-      resolve();
+      resolve('closed');
+    });
+
+    mainWindow.on('blur', () => {
+      resolve('closed');
     });
   });
   return { mainWindow, promise };
@@ -61,16 +69,32 @@ function createWindow() {
 
 function* showScreenLockWindow() {
   let windowHandle;
+  let focusRestoreSaga;
   try {
     windowHandle = createWindow();
     yield put(registerMainWindow(windowHandle.mainWindow));
-    yield call(() => windowHandle.promise);
-    windowHandle.mainWindow = undefined;
+    const { readyToPromptForActivity } = yield race({
+      readyToPromptForActivity: take(SCREENLOCK_WAIT_FOR_ACTIVITY),
+      windowClosed: call(() => windowHandle.promise),
+    });
+    if (readyToPromptForActivity) {
+      // The screenlock window spawned by default does not accept windowing
+      // events to prevent it getting killed by the user.
+      // This saga resets the window to start accepting windowing
+      // events on receiving the so that it can be killed
+      windowHandle.mainWindow.close();
+      // Open a new window that is focusable
+      windowHandle = createWindow();
+      yield put(registerMainWindow(windowHandle.mainWindow));
+      yield call(() => windowHandle.promise);
+    }
     yield put({ type: HALT_SCREENLOCK });
+    windowHandle.mainWindow = undefined;
   } catch (err) {
     logger.screenLock.error(`When handling window open/close: ${err}`);
   } finally {
     if (windowHandle.mainWindow) {
+      yield cancel(focusRestoreSaga);
       windowHandle.mainWindow.close();
     }
   }
