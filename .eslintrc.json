@@ -11,7 +11,8 @@
   },
   "rules": {
     "function-paren-newline": "off",
-    "arrow-parens": "off"
+    "arrow-parens": "off",
+    "linebreak-style": "off"
   },
   "settings": {
     "import/resolver": {

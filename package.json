@@ -40,6 +40,7 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "bunyan": "^1.8.12",
+    "cross-spawn": "^5.1.0",
     "electron": "^1.7.9",
     "hasbin": "^1.2.3",
     "minimist": "^1.2.0",

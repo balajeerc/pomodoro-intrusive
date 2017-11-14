@@ -111,7 +111,7 @@ export function* startScreenLockMessaging() {
     }
   } catch (err) {
     logger.nag.error(`Error when attempting to open message queue: ${err}`);
-    throw new Error(err);
+    // throw new Error(err);
   } finally {
     yield cancel(commandRelays);
     messageChannel.close();
@@ -160,7 +160,7 @@ export default function* startMessaging() {
     }
   } catch (err) {
     logger.nag.error(`Error when attempting to open message queue: ${err}`);
-    throw new Error(err);
+    // throw new Error(err);
   } finally {
     yield cancel(screenLockMessagingSaga);
     yield cancel(statusQuerySaga);

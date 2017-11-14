@@ -40,10 +40,10 @@ export function* startNagMessaging() {
     const connection = yield call(connect, config.control.screenLock.port, '127.0.0.1', 3000);
     const messageChannel = yield call(createSocketChannel, connection);
 
-    requestListener = yield [
-      fork(messageSender, connection, QUERY_POMODORO_NAG_STATUS),
-      fork(messageSender, connection, SCREENLOCK_DETECTED_ACTIVITY),
-    ];
+    // requestListener = yield [
+    //  fork(messageSender, connection, QUERY_POMODORO_NAG_STATUS),
+    //  fork(messageSender, connection, SCREENLOCK_DETECTED_ACTIVITY),
+    // ];
 
     while (true) {
       try {
@@ -134,6 +134,8 @@ export function* startRendererMessaging() {
     // This is a fatal error, terminate screenlock
     process.exit(1);
   } finally {
-    yield cancel(commandRelays);
+    if (commandRelays) {
+      yield cancel(commandRelays);
+    }
   }
 }

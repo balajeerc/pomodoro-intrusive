@@ -35,12 +35,13 @@ export function createListeningChannel(serverObject) {
         emit({ sender: remoteId, message: data });
       }
 
-      function onConnectionError(err) {
-        throw new Error(`Error in handling connection: ${err}`);
-      }
-
       function onConnClose() {
         delete serverObject.connections[remoteId]; // eslint-disable-line no-param-reassign
+      }
+
+      function onConnectionError(err) {
+        // throw new Error(`Error in handling connection: ${err}`);
+        onConnClose(err);
       }
 
       connection.once('close', onConnClose);

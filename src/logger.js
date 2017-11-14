@@ -1,3 +1,6 @@
+import path from 'path';
+import os from 'os';
+
 import bunyan from 'bunyan';
 import fs from 'fs';
 
@@ -43,10 +46,16 @@ function createLogger(appName, logFilePrefix) {
   return logger;
 }
 
+const pomodoroTmpDir = path.join(os.tmpdir(), 'pomodoro-intrusive');
+
+if (!fs.existsSync(pomodoroTmpDir)) {
+  fs.mkdirSync(pomodoroTmpDir);
+}
+
 const logger = {
-  client: createLogger('pomodoro-intrusive', '/tmp/pomodoro-intrusive'),
-  nag: createLogger('pomodoro-nag', '/tmp/pomodoro-nag'),
-  screenLock: createLogger('pomodoro-screenLock', '/tmp/pomodoro-screenLock'),
+  client: createLogger('pomodoro-intrusive', path.join(pomodoroTmpDir, 'client')),
+  nag: createLogger('pomodoro-nag', path.join(pomodoroTmpDir, 'nag')),
+  screenLock: createLogger('pomodoro-screenLock', path.join(pomodoroTmpDir, 'screenlock')),
 };
 
 export default logger;

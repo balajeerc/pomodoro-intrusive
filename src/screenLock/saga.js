@@ -69,7 +69,6 @@ function createWindow() {
 
 function* showScreenLockWindow() {
   let windowHandle;
-  let focusRestoreSaga;
   try {
     windowHandle = createWindow();
     yield put(registerMainWindow(windowHandle.mainWindow));
@@ -94,7 +93,6 @@ function* showScreenLockWindow() {
     logger.screenLock.error(`When handling window open/close: ${err}`);
   } finally {
     if (windowHandle.mainWindow) {
-      yield cancel(focusRestoreSaga);
       windowHandle.mainWindow.close();
     }
   }
@@ -110,9 +108,15 @@ export default function* screenLockMainSaga() {
 
   yield take(HALT_SCREENLOCK);
 
-  yield cancel(windowSpawner);
-  yield cancel(nagMessaging);
-  yield cancel(rendererMessaging);
+  if (windowSpawner) {
+    yield cancel(windowSpawner);
+  }
+  if (nagMessaging) {
+    yield cancel(nagMessaging);
+  }
+  if (rendererMessaging) {
+    yield cancel(rendererMessaging);
+  }
 
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
