@@ -18,6 +18,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
+    "copy-webpack-plugin": "^4.2.1",
     "cross-env": "^5.0.5",
     "eslint": "^4.8.0",
     "eslint-config-airbnb": "^15.1.0",
@@ -27,7 +28,8 @@
     "eslint-plugin-standard": "^3.0.1",
     "file-loader": "^1.1.5",
     "jest": "^21.2.1",
-    "webpack": "^3.8.0"
+    "webpack": "^3.8.0",
+    "webpack-node-externals": "^1.6.0"
   },
   "scripts": {
     "build": "webpack",
@@ -36,7 +38,7 @@
     "test:updateSnapshot": "cross-env NODE_ENV=test jest -u",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage",
     "prepack": "cp src/screenLock/index.html dist",
-    "postinstall": "cp src/screenLock/index.html dist"
+    "postinstall": "webpack"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
@@ -48,7 +50,6 @@
     "moment": "^2.19.1",
     "play-sound": "^1.1.1",
     "redux": "^3.7.2",
-    "redux-saga": "^0.15.6",
-    "webpack-node-externals": "^1.6.0"
+    "redux-saga": "^0.15.6"
   }
 }

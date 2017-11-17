@@ -1,5 +1,7 @@
 const path = require('path');
+
 const nodeExternals = require('webpack-node-externals');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   target: 'node',
@@ -16,6 +18,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'commonjs2',
   },
+  plugins: [new CopyWebpackPlugin([{ from: './src/screenLock/index.html', to: './index.html' }])],
   resolve: {
     extensions: ['.js'],
     modules: [path.resolve('./src'), path.resolve('./node_modules')],

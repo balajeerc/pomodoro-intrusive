@@ -39,7 +39,7 @@ function createWindow() {
       titleBarStyle: 'hidden',
       autoHideMenuBar: true,
       alwaysOnTop: true,
-      // fullscreen: true,
+      fullscreen: true,
     });
     mainWindow.setVisibleOnAllWorkspaces(true);
 

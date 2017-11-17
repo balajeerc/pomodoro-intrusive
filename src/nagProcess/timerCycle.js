@@ -11,13 +11,11 @@
  *
  */
 import { delay } from 'redux-saga';
-import { call, cancel, cps, fork, take, put } from 'redux-saga/effects';
-import soundPlay from 'play-sound';
+import { call, cancel, fork, take, put } from 'redux-saga/effects';
 
 import config from '../configLoader';
 import lockScreenLoop from './screenLockControl';
 import logger from '../logger';
-import SOUND_NOTIFICATION_FILE from '../../sounds/back_to_work_notification.wav';
 import {
   RESPONSE,
   SCREENLOCK_WAIT_FOR_ACTIVITY,
@@ -27,25 +25,6 @@ import { WAIT_ON_WORK, WAIT_ON_BREAK, START_ACTIVITY_CHECK } from '../pomodoroSt
 
 import { STOP_POMODORO_CYCLE } from './constants';
 import { startWork, startBreak, startActivityCheck } from './actions';
-
-// TODO: Make the following configurable using JSON
-const INACTIVITY_CHECK_REPEAT_INTERVAL = 5; // in secs
-
-const soundPlayer = soundPlay({});
-const playSound = soundPlayer.play.bind(soundPlayer);
-
-function* waitForActivity() {
-  while (true) {
-    try {
-      logger.nag.info('Playing notification to return to work');
-      yield cps(playSound, SOUND_NOTIFICATION_FILE);
-      yield call(delay, INACTIVITY_CHECK_REPEAT_INTERVAL * 1000);
-    } catch (error) {
-      logger.nag.error(`Malfunction when playing sound after break: ${error}`);
-      break; // break out of activity check since there is no point repeating check
-    }
-  }
-}
 
 function* waitOnWork() {
   while (true) {
@@ -79,7 +58,6 @@ function* transitionToWork() {
 
     yield put({ type: SCREENLOCK_WAIT_FOR_ACTIVITY });
 
-    const soundPlayLoop = yield fork(waitForActivity);
     yield take(SCREENLOCK_DETECTED_ACTIVITY);
     logger.nag.info('Detected activity. Closing screenlock');
     yield put({
@@ -88,8 +66,6 @@ function* transitionToWork() {
     });
 
     yield cancel(activityCheckCommand.screenLockTask);
-    yield cancel(soundPlayLoop);
-
     yield put(startWork());
   }
 }
