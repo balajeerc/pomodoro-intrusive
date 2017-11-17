@@ -1,3 +1,5 @@
+import path from 'path';
+
 import electron from 'electron';
 import moment from 'moment';
 
@@ -38,6 +40,15 @@ electron.ipcRenderer.on(ELECTRON_IPC_CHANNEL, (event, data) => {
         logger.screenLock.info('Recieved check activity command');
         // eslint-disable-next-line no-undef
         document.getElementById('main-caption').innerHTML = 'Press any key to unlock screen';
+        // Start playing return to work notification sound
+        setInterval(() => {
+          const distDir = path.resolve(process.argv[1], '..');
+          const notificationFile = path.join(distDir, 'sounds', 'back_to_work_notification.wav');
+          logger.screenLock.info(`Playing notification: ${notificationFile}`);
+          // eslint-disable-next-line no-undef
+          const audio = new Audio(notificationFile);
+          audio.play();
+        }, 5000);
       }
       break;
     }

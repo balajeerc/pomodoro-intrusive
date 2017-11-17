@@ -29,6 +29,7 @@ function createWindow() {
     const appDir = path.dirname(scriptPath);
     const htmlPath = path.join(appDir, 'index.html');
 
+    logger.screenLock.info(`Using HTML at: ${htmlPath}`);
     const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
 
     // Create the browser window.
@@ -38,7 +39,7 @@ function createWindow() {
       titleBarStyle: 'hidden',
       autoHideMenuBar: true,
       alwaysOnTop: true,
-      fullscreen: true,
+      // fullscreen: true,
     });
     mainWindow.setVisibleOnAllWorkspaces(true);
 
@@ -69,6 +70,7 @@ function createWindow() {
 
 function* showScreenLockWindow() {
   let windowHandle;
+  logger.screenLock.info('Opening screenlock window');
   try {
     windowHandle = createWindow();
     yield put(registerMainWindow(windowHandle.mainWindow));
@@ -99,8 +101,10 @@ function* showScreenLockWindow() {
 }
 
 export default function* screenLockMainSaga() {
+  logger.screenLock.info('Spawning screenlock sagas');
   yield take(LAUNCH);
 
+  logger.screenLock.info('Spawning screenlock sagas');
   const nagMessaging = yield fork(startNagMessaging);
   const rendererMessaging = yield fork(startRendererMessaging);
   yield call(delay, 1000);

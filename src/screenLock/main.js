@@ -4,12 +4,15 @@ import electron from 'electron';
 import store from './stateStore';
 import { launch } from './actions';
 
+import logger from '../logger';
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 electron.app.on('ready', () => {
   // Dispatch an action to the application state machine to start
   // process state machine
+  logger.screenLock.info('Starting screenlock main process');
   store.dispatch(launch());
 });
 
