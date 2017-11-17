@@ -37,8 +37,7 @@
     "test": "cross-env NODE_ENV=test jest",
     "test:updateSnapshot": "cross-env NODE_ENV=test jest -u",
     "test:coverage": "cross-env NODE_ENV=test jest --coverage",
-    "prepack": "cp src/screenLock/index.html dist",
-    "postinstall": "webpack"
+    "prepack": "cp src/screenLock/index.html dist"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
