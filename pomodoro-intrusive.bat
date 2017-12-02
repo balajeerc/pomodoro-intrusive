@@ -1,1 +1,1 @@
-node ./dist/pomodoro-intrusive.js
+node ./dist/pomodoro-intrusive.js %*

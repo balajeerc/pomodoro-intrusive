@@ -36,8 +36,7 @@
     "lint": "eslint src",
     "test": "cross-env NODE_ENV=test jest",
     "test:updateSnapshot": "cross-env NODE_ENV=test jest -u",
-    "test:coverage": "cross-env NODE_ENV=test jest --coverage",
-    "prepack": "cp src/screenLock/index.html dist"
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
