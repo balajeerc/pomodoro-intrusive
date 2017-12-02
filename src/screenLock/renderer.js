@@ -10,6 +10,8 @@ import { START_ACTIVITY_CHECK } from '../pomodoroStates';
 import { createPomodoroStatusRequest, screenLockDetectedActivity } from './actions';
 import { ELECTRON_IPC_CHANNEL } from './constants';
 
+import notificationFile from '../../sounds/back_to_work_notification.wav';
+
 logger.screenLock.info('Starting screenlock renderer');
 
 let startTime;
@@ -42,11 +44,17 @@ electron.ipcRenderer.on(ELECTRON_IPC_CHANNEL, (event, data) => {
         document.getElementById('main-caption').innerHTML = 'Press any key to unlock screen';
         // Start playing return to work notification sound
         setInterval(() => {
-          const distDir = path.resolve(process.argv[1], '..');
-          const notificationFile = path.join(distDir, 'sounds', 'back_to_work_notification.wav');
-          logger.screenLock.info(`Playing notification: ${notificationFile}`);
+          // While we could just hardcode the path of the notification file as sounds/<filename>.wav
+          // we need to use the ES6 import so that webpack packages the sound file into dist.
+          // However, the path returned by the module system is dist/sounds/<filename>.wav
+          // The following code is just to snip the leading 'dist/' from the path
+          const soundNotificationFilePath = path.join(
+            'sounds',
+            path.posix.basename(notificationFile),
+          );
+          logger.screenLock.info(`Playing notification: ${soundNotificationFilePath}`);
           // eslint-disable-next-line no-undef
-          const audio = new Audio(notificationFile);
+          const audio = new Audio(soundNotificationFilePath);
           audio.play();
         }, 5000);
       }
