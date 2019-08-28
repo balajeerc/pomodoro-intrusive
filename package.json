@@ -1,6 +1,6 @@
 {
   "name": "pomodoro-intrusive",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Intrusive commandline pomodoro utility that locks you out of your screen!",
   "repository": "git@github.com:balajeerc/pomodoro-intrusive.git",
   "author": "Balajee Ramachandran",
