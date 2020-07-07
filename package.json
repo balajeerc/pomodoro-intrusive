@@ -42,7 +42,7 @@
     "babel-polyfill": "^6.26.0",
     "bunyan": "^1.8.12",
     "cross-spawn": "^5.1.0",
-    "electron": "^1.7.9",
+    "electron": "^7.2.4",
     "hasbin": "^1.2.3",
     "minimist": "^1.2.0",
     "moment": "^2.19.1",
